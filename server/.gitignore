@@ -16,3 +16,5 @@ yarn-error.log*
 # Build directory
 /dist
 /build
+
+/src/generated/prisma

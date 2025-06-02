@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  
+  id   Int  @id @default(autoincrement()) 
+  email String @unique
+  name String
+  password String
+  createdAt DateTime @default(now())
+  lastLogin DateTime?
+  isverified Boolean @default(false)
+  confirmationCode ConfirmationCode[]
+  searchHistory SearchHistory[]
+  favoriteCity favoriteCity[]
+}
+
+
+ model city {
+  id Int @id @default(autoincrement())
+  name String
+  country String
+  latitude Float
+  longitude Float
+  
+  searchHistory SearchHistory[]
+  favoriteCity favoriteCity[]
+  
+ }
+  
+
+model ConfirmationCode {
+  id Int @id @default(autoincrement())
+  code String @unique
+  userId Int 
+  used Boolean @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  codeType CodeType 
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model SearchHistory {
+  id  Int @id @default(autoincrement())
+  cityId Int 
+  userId Int 
+  lastSearchDate DateTime @default(now())
+  quantity Int @default(1)
+
+
+  user User @relation(fields: [userId], references: [id])   
+  city city @relation(fields: [cityId], references: [id])
+
+  @@index([userId])
+  @@index([cityId])
+  @@index([lastSearchDate])
+
+}
+
+model favoriteCity {
+  id Int @id @default(autoincrement())
+  userId Int
+  cityId Int
+  addedDate  DateTime @default(now())
+  isFixed Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+  city city @relation(fields: [cityId], references: [id])
+
+  @@unique([userId, cityId])
+  @@index([userId , cityId])
+
+
+
+}
+
+
+enum CodeType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
