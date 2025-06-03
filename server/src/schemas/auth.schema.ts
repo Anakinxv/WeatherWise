@@ -23,11 +23,12 @@ export const ResetPasswordSchema = z.object({
 // esquema de respuesta de usuario (sin datos sensibles)
 
 export const UserResponseSchema = z.object({
-  id: z.string(),
+  id: z.number(),
   name: z.string(),
   email: z.string().email(),
   createdAt: z.date(),
-  updatedAt: z.date(),
+  isverified: z.boolean(),
+  lastLogin: z.date().nullable(), // Hacer nullable porque puede ser null
 });
 
 // Tipos inferidos

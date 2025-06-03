@@ -1,12 +1,11 @@
-import { Request, Response } from "express";
-import express from "express";
+import { Router } from "express";
+import { register } from "../controllers/auth.controller";
+import { validate } from "../middlewares/validate";
+import { CreateUserSchema } from "../schemas/auth.schema";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/login", (req: Request, res: Response) => {});
-router.get("/logout", (req: Request, res: Response) => {});
-router.get("/register", (req: Request, res: Response) => {});
-router.get("/verify", (req: Request, res: Response) => {});
-router.get("/forgot-password", (req: Request, res: Response) => {});
-router.get("/reset-password", (req: Request, res: Response) => {});
+// POST /auth/register
+router.post("/register", validate(CreateUserSchema), register);
 
+export default router;
