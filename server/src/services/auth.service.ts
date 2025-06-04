@@ -33,12 +33,6 @@ export const registerUser = async (input: CreateUserInput, res: Response) => {
       },
     });
 
-    // Generar un token JWT
-    const token = generateToken(res, {
-      userId: newUser.id,
-      email: newUser.email,
-    });
-
     // Crear respuesta usando el type UserResponse
     const userResponse: UserResponse = {
       id: newUser.id,
@@ -51,10 +45,59 @@ export const registerUser = async (input: CreateUserInput, res: Response) => {
 
     return res.status(201).json({
       user: userResponse,
-      token,
+      message: "User registered successfully",
     });
   } catch (error) {
     console.error("Error registering user:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const loginUser = async (input: LoginUserInput, res: Response) => {
+  const { email, password } = input;
+
+  try {
+    const userExist = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!userExist) {
+      return res.status(400).json({ error: "User does not exist" });
+    }
+
+    const isPasswordValid = await comparePassword(password, userExist.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid password" });
+    }
+
+    const token = generateToken(res, {
+      userId: userExist.id,
+      email: userExist.email,
+    });
+
+    await prisma.user.update({
+      where: { id: userExist.id },
+      data: {
+        lastLogin: new Date(),
+        isverified: true,
+      },
+    });
+
+    const userResponse: UserResponse = {
+      id: userExist.id,
+      name: userExist.name,
+      email: userExist.email,
+      createdAt: userExist.createdAt,
+      isverified: userExist.isverified,
+      lastLogin: userExist.lastLogin, // Puede ser null si nunca ha iniciado sesión
+    };
+
+    return res.status(200).json({
+      user: userResponse,
+      message: "User logged in successfully",
+    });
+  } catch (error) {
+    console.error("Error logging in user:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
