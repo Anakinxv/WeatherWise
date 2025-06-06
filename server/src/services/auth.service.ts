@@ -1,12 +1,20 @@
 import { prisma } from "../config/connectDB";
 import {
   CreateUserInput,
+  ForgotPasswordInput,
   LoginUserInput,
   UserResponse,
 } from "../schemas/auth.schema";
 import { hashPassword, comparePassword } from "../utils/hash.utils";
 import { generateToken } from "../utils/jwt.utils";
 import { Request, Response } from "express";
+import {
+  passwordResetEmailSender,
+  welcomeEmailSender,
+} from "../mails/emailsSender";
+import { generatePasswordCode } from "../utils/generatedPasswordCode";
+import { PASSWORD_RESET_REQUEST_TEMPLATE } from "../mails/emailsTemplates";
+import { sendEmail } from "../mails/emailService";
 
 export const registerUser = async (input: CreateUserInput, res: Response) => {
   const { name, email, password } = input;
@@ -32,6 +40,8 @@ export const registerUser = async (input: CreateUserInput, res: Response) => {
         password: hashedPassword,
       },
     });
+
+    welcomeEmailSender(newUser.name, newUser.email);
 
     // Crear respuesta usando el type UserResponse
     const userResponse: UserResponse = {
@@ -98,6 +108,83 @@ export const loginUser = async (input: LoginUserInput, res: Response) => {
     });
   } catch (error) {
     console.error("Error logging in user:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const logoutUser = async (res: Response) => {
+  res.clearCookie("token");
+  return res.status(200).json({ message: "User logged out successfully" });
+};
+
+export const forgotPasswordUser = async (
+  input: ForgotPasswordInput,
+  res: Response
+) => {
+  const { email } = input;
+
+  try {
+    const userExist = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!userExist) {
+      return res.status(400).json({ error: "User does not exist" });
+    }
+
+    // Buscar código existente para este usuario
+    const existingCode = await prisma.confirmationCode.findFirst({
+      where: {
+        userId: userExist.id,
+        codeType: "PASSWORD_RESET",
+        used: false,
+        expiresAt: {
+          gt: new Date(), // Solo códigos que no han expirado
+        },
+      },
+    });
+
+    let verificationCode: string;
+
+    if (existingCode) {
+      // Si ya existe un código válido, actualizarlo
+      verificationCode = generatePasswordCode();
+
+      await prisma.confirmationCode.update({
+        where: { id: existingCode.id },
+        data: {
+          code: verificationCode,
+          expiresAt: new Date(Date.now() + 3600000), // 1 hora de expiración
+          createdAt: new Date(),
+        },
+      });
+    } else {
+      // Si no existe código válido, crear uno nuevo
+      verificationCode = generatePasswordCode();
+
+      await prisma.confirmationCode.create({
+        data: {
+          code: verificationCode,
+          userId: userExist.id,
+          used: false,
+          expiresAt: new Date(Date.now() + 3600000), // 1 hora de expiración
+          codeType: "PASSWORD_RESET",
+        },
+      });
+    }
+
+    await passwordResetEmailSender(
+      userExist.email,
+      userExist.name,
+      verificationCode
+    );
+
+    return res.status(200).json({
+      message: "Password reset code sent to your email",
+      code: verificationCode,
+    });
+  } catch (error) {
+    console.error("Error in forgot password:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
