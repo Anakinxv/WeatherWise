@@ -3,6 +3,7 @@ import {
   CreateUserInput,
   ForgotPasswordInput,
   LoginUserInput,
+  ResetPasswordInput,
   UserResponse,
 } from "../schemas/auth.schema";
 import { hashPassword, comparePassword } from "../utils/hash.utils";
@@ -11,10 +12,10 @@ import { Request, Response } from "express";
 import {
   passwordResetEmailSender,
   welcomeEmailSender,
+  passwordResetSuccessEmailSender,
 } from "../mails/emailsSender";
 import { generatePasswordCode } from "../utils/generatedPasswordCode";
-import { PASSWORD_RESET_REQUEST_TEMPLATE } from "../mails/emailsTemplates";
-import { sendEmail } from "../mails/emailService";
+import crypto from "crypto";
 
 export const registerUser = async (input: CreateUserInput, res: Response) => {
   const { name, email, password } = input;
@@ -185,6 +186,64 @@ export const forgotPasswordUser = async (
     });
   } catch (error) {
     console.error("Error in forgot password:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const resetPasswordUser = async (
+  input: ResetPasswordInput,
+  res: Response
+) => {
+  try {
+    const { code, password } = input;
+
+    const userCode = await prisma.confirmationCode.findFirst({
+      where: { code, codeType: "PASSWORD_RESET", used: false },
+    });
+
+    if (!userCode) {
+      return res.status(400).json({ error: "Invalid or expired code" });
+    }
+    // Verificar si el código ha expirado
+    if (userCode.expiresAt < new Date()) {
+      return res.status(400).json({ error: "Code has expired" });
+    }
+
+    // Hash la nueva contraseña
+    const newPassword = await hashPassword(password);
+
+    await prisma.user.update({
+      where: { id: userCode.userId },
+
+      data: {
+        password: newPassword,
+      },
+    });
+
+    await prisma.confirmationCode.update({
+      where: { id: userCode.id },
+
+      data: {
+        code: "",
+      },
+    });
+
+    const user = await prisma.user.findUnique({
+      where: { id: userCode.userId },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Enviar correo de éxito
+    passwordResetSuccessEmailSender(user.email, user.name);
+
+    return res.status(200).json({
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    console.error("Error resetting password:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };

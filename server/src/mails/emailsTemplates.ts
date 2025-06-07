@@ -295,7 +295,10 @@ export const PASSWORD_RESET_REQUEST_TEMPLATE = (
 `;
 
 // Plantilla: Password Reset Success
-export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
+// ...existing code...
+
+// Plantilla: Password Reset Success - Convertir a función
+export const PASSWORD_RESET_SUCCESS_TEMPLATE = (userName: string) => `
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -350,7 +353,7 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
           <!-- Content -->
           <tr>
             <td class="content" style="padding: 50px 40px; text-align: center;">
-              <h2 style="margin: 0 0 24px; color: #1a1a1a; font-size: 24px; font-weight: 600;">✅ Todo Listo</h2>
+              <h2 style="margin: 0 0 24px; color: #1a1a1a; font-size: 24px; font-weight: 600;">Hola ${userName} 👋</h2>
               <p style="margin: 0 0 32px; color: #6b7280; font-size: 18px; line-height: 1.6;">Tu contraseña ha sido restablecida exitosamente. Ahora puedes acceder a tu cuenta con tu nueva contraseña.</p>
               
               <!-- Success Stats -->
@@ -371,6 +374,13 @@ export const PASSWORD_RESET_SUCCESS_TEMPLATE = `
                     </td>
                   </tr>
                 </table>
+              </div>
+              
+              <!-- Personal Message -->
+              <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 12px; padding: 24px; margin: 40px 0;">
+                <p style="margin: 0; color: #0369a1; font-size: 16px; line-height: 1.6; font-weight: 500;">
+                  🎉 ¡Excelente, ${userName}! Tu cuenta está ahora más segura que nunca.
+                </p>
               </div>
               
               <!-- CTA -->

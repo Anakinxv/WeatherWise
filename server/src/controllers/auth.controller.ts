@@ -3,13 +3,16 @@ import {
   CreateUserInput,
   ForgotPasswordInput,
   LoginUserInput,
+  ResetPasswordInput,
 } from "../schemas/auth.schema";
 import {
   loginUser,
   registerUser,
   logoutUser,
   forgotPasswordUser,
+  resetPasswordUser,
 } from "../services/auth.service";
+import { promise } from "zod";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   const input: CreateUserInput = req.body;
@@ -34,3 +37,12 @@ export const forgotPassword = async (
   await forgotPasswordUser(input, res);
 };
 // Aquí deberías implementar la
+
+export const resetPassword = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const input: ResetPasswordInput = req.body;
+
+  await resetPasswordUser(input, res);
+};

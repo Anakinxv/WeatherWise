@@ -37,3 +37,19 @@ export const passwordResetEmailSender = async (
     return { success: false, error };
   }
 };
+
+export const passwordResetSuccessEmailSender = async (
+  userEmail: string,
+  userName: string
+) => {
+  try {
+    return await sendEmail({
+      to: userEmail,
+      subject: "✅ Contraseña restablecida con éxito - WeatherWise",
+      html: PASSWORD_RESET_SUCCESS_TEMPLATE(userName),
+    });
+  } catch (error) {
+    console.error("❌ Error al enviar el correo de éxito:", error);
+    return { success: false, error };
+  }
+};
