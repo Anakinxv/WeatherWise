@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Input } from "../ui/input";
+import { Eye, EyeOff } from "@geist-ui/icons";
 
 type AuthInPutsProps = {
   type?: string;
@@ -9,10 +10,8 @@ type AuthInPutsProps = {
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
-  className?: string;
   error?: string;
   disabled?: boolean;
-  icon?: React.ReactNode;
 };
 
 function AuthInPuts({
@@ -22,36 +21,59 @@ function AuthInPuts({
   value,
   onChange,
   required = false,
-  className,
   error,
   disabled = false,
-  icon,
+  ...props
 }: AuthInPutsProps) {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
+  };
+
+  // Determine the input type - if it's password and showPassword is true, use text
+  const inputType = type === "password" && showPassword ? "text" : type;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`relative ${className}`}
+      className="w-full"
     >
       <div className="relative">
-        {icon && (
-          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            {icon}
-          </div>
+        {type === "password" && (
+          <button
+            type="button"
+            onClick={handleTogglePasswordVisibility}
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer transition-colors duration-200 hover:text-primary"
+            aria-label={
+              showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+            }
+          >
+            {showPassword ? (
+              <Eye className="w-4 h-4" />
+            ) : (
+              <EyeOff className="w-4 h-4" />
+            )}
+          </button>
         )}
+
         <Input
-          type={type}
+          type={inputType}
           placeholder={placeholder}
           name={name}
           value={value}
           onChange={onChange}
           required={required}
-          className={`w-full pl-10 pr-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            error ? "border-red-500" : ""
-          } ${disabled ? "bg-gray-200 cursor-not-allowed" : ""}`}
           disabled={disabled}
-        ></Input>{" "}
+          className="w-full rounded-3xl px-4 py-2 border-[1px] auth-input"
+          style={{
+            height: "auto",
+            minHeight: "44px",
+          }}
+          {...props}
+        />
       </div>
 
       {error && (
