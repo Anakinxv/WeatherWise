@@ -2,7 +2,7 @@ import AuthCard from "../components/authComponents/AuthCard";
 import { Mail, Lock } from "@geist-ui/icons";
 import AuthInPuts from "../components/authComponents/AuthInputs";
 import AuthButtons from "../components/authComponents/AuthButtons";
-import { Button } from "@/components/ui/button";
+
 import {
   Form,
   FormField,

@@ -49,14 +49,11 @@ function Resgister() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <AuthInputs
-                    type="text"
-                    placeholder="Nombre"
-                    name="name"
-                    {...field}
-                  />
+                  <AuthInputs type="text" placeholder="Nombre" {...field} />
                 </FormControl>
-                <FormDescription>{form.formState.errors.name}</FormDescription>
+                <FormDescription>
+                  {form.formState.errors.name?.message}
+                </FormDescription>
               </FormItem>
             )}
           />

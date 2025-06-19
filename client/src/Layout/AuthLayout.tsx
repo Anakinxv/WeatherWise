@@ -14,7 +14,7 @@ function AuthLayout() {
         <ThemeButton />
       </div>
       <img
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         src={actualTheme === "dark" ? Darkbg : LightBg}
         alt="Background"
       />

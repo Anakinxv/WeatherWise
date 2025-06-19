@@ -6,7 +6,7 @@ import LogIn from "./pages/LogIn";
 import Resgister from "./pages/Resgister";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
-
+import NewPassword from "./pages/NewPassword";
 function App() {
   return (
     <Router>
@@ -25,6 +25,10 @@ function App() {
             path="/forgot-password"
             element={<ForgotPassword></ForgotPassword>}
           />
+          <Route
+            path="/new-password"
+            element={<NewPassword></NewPassword>}
+          ></Route>
         </Route>
       </Routes>
     </Router>

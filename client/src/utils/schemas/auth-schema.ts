@@ -18,3 +18,19 @@ export const registerSchema = z
     message: "Passwords must match",
     path: ["confirmPassword"],
   });
+
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+    })
+    .email("Invalid email address"),
+});
+
+export const resetPasswordSchema = z.object({
+  code: z
+    .string({
+      required_error: "Code is required",
+    })
+    .length(6, "Code must be exactly 6 characters long"),
+});
