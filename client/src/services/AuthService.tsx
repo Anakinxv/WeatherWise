@@ -1,0 +1,48 @@
+import axios from "axios";
+import type {
+  RegisterAPIType,
+  loginType,
+  AuthResponseType,
+} from "../types/authTypes";
+import {
+  singupResponseSchema,
+  loginShcema,
+} from "../utils/schemas/auth-schema";
+
+const API_URL = "http://localhost:3000/api/auth";
+
+export const singupService = async (
+  data: RegisterAPIType
+): Promise<AuthResponseType> => {
+  try {
+    const response = await axios.post(`${API_URL}/register`, data);
+
+    // Parse response.data, not the entire axios response object
+    const parsedData = singupResponseSchema.safeParse(response.data);
+
+    if (!parsedData.success) {
+      throw new Error("Formato de respuesta inválido");
+    }
+
+    return parsedData.data;
+  } catch (error: string | any) {
+    // Propagar el error para que lo maneje el slice
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    } else if (error.response?.data?.error) {
+      throw new Error(error.response.data.error);
+    }
+    throw new Error(error.message || "Error desconocido");
+  }
+};
+
+// {
+//   "email": "emmanuel032503@gmail.com",
+//   "password": "heren1010"
+// }
+
+export const loginService = async (data: loginType): Promise<void> => {
+  const response = await axios.post(`${API_URL}/login`, data);
+
+  const parsedData = loginShcema.safeParse(response.data);
+};

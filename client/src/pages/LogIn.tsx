@@ -24,8 +24,6 @@ function LogIn() {
     defaultValues: { email: "", password: "" },
   });
 
-  console.log("Form values:", form.formState.errors);
-
   const loginText = {
     title: "Iniciar sesión con correo electrónico",
     description:

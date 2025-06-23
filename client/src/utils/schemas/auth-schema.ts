@@ -7,15 +7,15 @@ export const loginShcema = z.object({
 
 export const registerSchema = z
   .object({
-    name: z.string().min(1, "Name is required"),
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters long"),
-    confirmPassword: z
+    name: z.string().min(1, "El nombre es requerido"),
+    email: z.string().email("Dirección de email inválida"),
+    password: z
       .string()
-      .min(8, "Confirm Password must be at least 8 characters long"),
+      .min(8, "La contraseña debe tener al menos 8 caracteres"),
+    confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords must match",
+    message: "Las contraseñas no coinciden",
     path: ["confirmPassword"],
   });
 
@@ -33,4 +33,17 @@ export const resetPasswordSchema = z.object({
       required_error: "Code is required",
     })
     .length(6, "Code must be exactly 6 characters long"),
+});
+
+export const userSchema = z.object({
+  name: z.string().min(1, "El nombre es requerido"),
+  email: z.string().email("Email inválido"),
+  createdAt: z.string().datetime(),
+  isverified: z.boolean(),
+  lastLogin: z.string().datetime().nullable(),
+});
+
+export const singupResponseSchema = z.object({
+  user: userSchema,
+  message: z.string(),
 });
