@@ -15,9 +15,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginShcema } from "../utils/schemas/auth-schema";
 import { Link, useNavigate } from "react-router-dom";
 import type { loginType } from "@/types/authTypes";
-
+import { useAuthStore } from "@/store/useAppStores";
+import { useEffect } from "react";
 function LogIn() {
   const navigate = useNavigate();
+  const error = useAuthStore((state) => state.error);
+  const login = useAuthStore((state) => state.login);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   const form = useForm<loginType>({
     resolver: zodResolver(loginShcema),
@@ -30,14 +34,28 @@ function LogIn() {
       "Inicia sesión ahora y acelera tu camino hacia la libertad financiera.",
   };
 
-  const onSummit = form.handleSubmit((values: loginType) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Redirigir al usuario a la página de inicio si ya está autenticado
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated]);
+
+  const onSummit = form.handleSubmit(async (values: loginType) => {
     console.log("Form submitted with values:", values);
 
-    navigate("/"); // Redirigir a la página de inicio después del inicio de sesión exitoso
+    try {
+      await login(values.email, values.password);
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
   });
 
   return (
     <AuthCard title={loginText.title} description={loginText.description}>
+      {error && (
+        <div className="bg-red-500 text-white p-2 rounded mb-4">{error}</div>
+      )}
       <Form {...form}>
         <form
           className="w-full flex flex-col justify-around h-full"

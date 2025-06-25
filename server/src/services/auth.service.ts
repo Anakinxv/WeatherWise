@@ -5,6 +5,7 @@ import {
   LoginUserInput,
   ResetPasswordInput,
   UserResponse,
+  VerifyCodeInput,
 } from "../schemas/auth.schema";
 import { hashPassword, comparePassword } from "../utils/hash.utils";
 import { generateToken } from "../utils/jwt.utils";
@@ -195,55 +196,140 @@ export const resetPasswordUser = async (
   res: Response
 ) => {
   try {
-    const { code, password } = input;
+    const { email, code, password } = input;
 
-    const userCode = await prisma.confirmationCode.findFirst({
-      where: { code, codeType: "PASSWORD_RESET", used: false },
-    });
+    // Step 1: Find user
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: { email },
+      });
+    } catch (error) {
+      console.error("Error finding user:", error);
+      return res
+        .status(500)
+        .json({ error: "Database error when finding user" });
+    }
+
+    if (!user) {
+      return res.status(400).json({ error: "User does not exist" });
+    }
+
+    // Step 2: Find confirmation code
+    let userCode;
+    try {
+      userCode = await prisma.confirmationCode.findFirst({
+        where: {
+          userId: user.id,
+          code: code,
+          used: false,
+          codeType: "PASSWORD_RESET",
+        },
+      });
+    } catch (error) {
+      console.error("Error finding confirmation code:", error);
+      return res
+        .status(500)
+        .json({ error: "Database error when finding confirmation code" });
+    }
 
     if (!userCode) {
       return res.status(400).json({ error: "Invalid or expired code" });
     }
-    // Verificar si el código ha expirado
+
+    // Check if code has expired
     if (userCode.expiresAt < new Date()) {
       return res.status(400).json({ error: "Code has expired" });
     }
 
-    // Hash la nueva contraseña
-    const newPassword = await hashPassword(password);
-
-    await prisma.user.update({
-      where: { id: userCode.userId },
-
-      data: {
-        password: newPassword,
-      },
-    });
-
-    await prisma.confirmationCode.update({
-      where: { id: userCode.id },
-
-      data: {
-        code: "",
-      },
-    });
-
-    const user = await prisma.user.findUnique({
-      where: { id: userCode.userId },
-    });
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+    // Step 3: Hash password
+    let newPassword;
+    try {
+      newPassword = await hashPassword(password);
+    } catch (error) {
+      console.error("Error hashing password:", error);
+      return res.status(500).json({ error: "Error creating secure password" });
     }
 
-    // Enviar correo de éxito
-    passwordResetSuccessEmailSender(user.email, user.name);
+    // Step 4: Update user password
+    try {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          password: newPassword,
+        },
+      });
+    } catch (error) {
+      console.error("Error updating user password:", error);
+      return res
+        .status(500)
+        .json({ error: "Database error when updating password" });
+    }
+
+    // Step 5: Mark code as used
+    try {
+      await prisma.confirmationCode.update({
+        where: { id: userCode.id },
+        data: {
+          used: true,
+          code: "",
+        },
+      });
+    } catch (error) {
+      console.error("Error updating confirmation code:", error);
+      // Password was updated, so don't return error to user
+    }
+
+    // Step 6: Send success email
+    try {
+      await passwordResetSuccessEmailSender(user.email, user.name);
+    } catch (error) {
+      console.error("Error sending success email:", error);
+      // Password was updated, so return success with warning
+      return res.status(200).json({
+        message:
+          "Password reset successfully, but confirmation email could not be sent",
+      });
+    }
 
     return res.status(200).json({
       message: "Password reset successfully",
     });
   } catch (error) {
     console.error("Error resetting password:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const verifyCodeUser = async (input: VerifyCodeInput, res: Response) => {
+  const { email, code } = input;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(400).json({ error: "User does not exist" });
+    }
+
+    const confirmationCode = await prisma.confirmationCode.findFirst({
+      where: {
+        userId: user.id,
+        code: code,
+        used: false,
+      },
+    });
+
+    if (!confirmationCode) {
+      return res.status(400).json({ error: "Invalid or expired code" });
+    }
+
+    return res.status(200).json({
+      message: "Code verified successfully",
+    });
+  } catch (error) {
+    console.error("Error verifying code:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };

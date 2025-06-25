@@ -4,6 +4,7 @@ import {
   ForgotPasswordInput,
   LoginUserInput,
   ResetPasswordInput,
+  VerifyCodeInput,
 } from "../schemas/auth.schema";
 import {
   loginUser,
@@ -11,6 +12,7 @@ import {
   logoutUser,
   forgotPasswordUser,
   resetPasswordUser,
+  verifyCodeUser,
 } from "../services/auth.service";
 import { promise } from "zod";
 
@@ -45,4 +47,13 @@ export const resetPassword = async (
   const input: ResetPasswordInput = req.body;
 
   await resetPasswordUser(input, res);
+};
+
+export const verifyCode = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const input: VerifyCodeInput = req.body;
+
+  await verifyCodeUser(input, res);
 };

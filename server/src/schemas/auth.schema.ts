@@ -16,12 +16,17 @@ export const ForgotPasswordSchema = z.object({
 });
 
 export const ResetPasswordSchema = z.object({
+  email: z.string().email(),
   code: z.string().length(6, "Code must be exactly 6 characters long"),
   password: z.string().min(8, "Password must be at least 8 characters long"),
 });
 
 // esquema de respuesta de usuario (sin datos sensibles)
 
+export const VerifyCodeSchema = z.object({
+  code: z.string().length(6, "Code must be exactly 6 characters long"),
+  email: z.string().email(),
+});
 export const UserResponseSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -38,3 +43,4 @@ export type LoginUserInput = z.infer<typeof LoginUserSchema>;
 export type ForgotPasswordInput = z.infer<typeof ForgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof ResetPasswordSchema>;
 export type UserResponse = z.infer<typeof UserResponseSchema>;
+export type VerifyCodeInput = z.infer<typeof VerifyCodeSchema>;

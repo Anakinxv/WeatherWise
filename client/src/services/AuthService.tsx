@@ -36,13 +36,43 @@ export const singupService = async (
   }
 };
 
-// {
-//   "email": "emmanuel032503@gmail.com",
-//   "password": "heren1010"
-// }
+export const loginService = async (
+  data: loginType
+): Promise<AuthResponseType> => {
+  try {
+    const response = await axios.post(`${API_URL}/login`, data);
 
-export const loginService = async (data: loginType): Promise<void> => {
-  const response = await axios.post(`${API_URL}/login`, data);
+    const parsedData = singupResponseSchema.safeParse(response.data);
+    if (!parsedData.success) {
+      throw new Error("Formato de respuesta inválido");
+    }
 
-  const parsedData = loginShcema.safeParse(response.data);
+    return parsedData.data;
+  } catch (error: string | any) {
+    // Propagar el error para que lo maneje el slice
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    } else if (error.response?.data?.error) {
+      throw new Error(error.response.data.error);
+    }
+    throw new Error(error.message || "Error desconocido");
+  }
+};
+
+export const forgotPasswordService = async (
+  email: string
+): Promise<boolean> => {
+  try {
+    await axios.post(`${API_URL}/forgot-password`, { email });
+    return true;
+  } catch (error: string | any) {
+    // Propagar el error para que lo maneje el slice
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    } else if (error.response?.status === 400) {
+      throw new Error("Correo electrónico no válido o no encontrado");
+    } else {
+      throw new Error("Error al enviar el correo de recuperación");
+    }
+  }
 };

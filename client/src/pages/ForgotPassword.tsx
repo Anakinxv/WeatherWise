@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AuthCard from "../components/authComponents/AuthCard";
 import AuthInPuts from "@/components/authComponents/AuthInputs";
 import AuthButtons from "@/components/authComponents/AuthButtons";
@@ -16,8 +16,14 @@ import { useNavigate } from "react-router-dom";
 
 import { forgotPasswordSchema } from "../utils/schemas/auth-schema";
 import type { forgotPasswordType } from "@/types/authTypes";
+import { useAuthStore } from "@/store/useAppStores";
+
 function ForgotPassword() {
   const navigate = useNavigate();
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const { forgotPassword } = useAuthStore((state) => state);
+  const { error } = useAuthStore((state) => state);
 
   const form = useForm<forgotPasswordType>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -28,10 +34,28 @@ function ForgotPassword() {
     description: "Ingresa tu correo electrónico para recuperar tu contraseña.",
   };
 
-  const handleSubmit = form.handleSubmit((values: forgotPasswordType) => {
+  // Efecto para manejar la navegación cuando el estado de error se actualice
+  useEffect(() => {
+    if (isSubmitted && !error) {
+      // Usar ruta absoluta en lugar de relativa
+      navigate("/reset-password");
+      setIsSubmitted(false);
+    }
+  }, [error, isSubmitted, navigate]);
+
+  const handleSubmit = form.handleSubmit(async (values: forgotPasswordType) => {
     console.log("Form submitted with values:", values);
 
-    navigate("/reset-password"); // Redirect to reset password page after submitting
+    try {
+      const success = await forgotPassword(values.email);
+
+      // Solo marcar como enviado si fue exitoso
+      if (success) {
+        setIsSubmitted(true);
+      }
+    } catch (error) {
+      console.error("Error during forgot password:", error);
+    }
   });
 
   return (
@@ -39,6 +63,10 @@ function ForgotPassword() {
       title={forgotPasswordText.title}
       description={forgotPasswordText.description}
     >
+      {error && (
+        <div className="bg-red-500 text-white p-2 rounded mb-4">{error}</div>
+      )}
+
       <Form {...form}>
         <form
           onSubmit={handleSubmit}
