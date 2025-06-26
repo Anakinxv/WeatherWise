@@ -35,6 +35,16 @@ export const resetPasswordSchema = z.object({
     .length(6, "Code must be exactly 6 characters long"),
 });
 
+export const newPasswordSchema = z
+  .object({
+    password: z.string().min(8, "Password must be at least 8 characters long"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 export const userSchema = z.object({
   name: z.string().min(1, "El nombre es requerido"),
   email: z.string().email("Email inválido"),
@@ -46,4 +56,19 @@ export const userSchema = z.object({
 export const singupResponseSchema = z.object({
   user: userSchema,
   message: z.string(),
+});
+
+export const codeVerificationSchema = z.object({
+  code: z.string().length(6, "El código debe tener 6 caracteres"),
+  email: z.string().email("Dirección de email inválida"),
+});
+
+export const changePasswordSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+    })
+    .email("Invalid email address"),
+  code: z.string().length(6, "El código debe tener 6 caracteres"),
+  password: z.string().min(8, "Password must be at least 8 characters long"),
 });
