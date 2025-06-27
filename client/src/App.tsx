@@ -11,6 +11,7 @@ import DashboardHome from "./pages/DashboardHome";
 import { useAuthStore } from "./store/useAppStores";
 import { Navigate } from "react-router-dom";
 import LoadingSpinner from "./components/commonComponents.tsx/LoadingSpinner";
+import DashLayout from "./Layout/DashLayout";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -51,14 +52,16 @@ function App() {
             <Route path="/new-password" element={<NewPassword />} />
           </Route>
 
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <DashboardHome />
-              </ProtectedRoute>
-            }
-          />
+          <Route element={<DashLayout />}>
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <DashboardHome />
+                </ProtectedRoute>
+              }
+            />
+          </Route>
         </Routes>
       </Router>
     </>

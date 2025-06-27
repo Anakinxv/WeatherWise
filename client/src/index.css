@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 @layer base {
@@ -17,11 +18,23 @@
     --accent: 202 88% 78%; /* Light Blue #A0D6F8 */
     --accent-foreground: 0 0% 0%; /* Black #000000 */
     --border: 0 0% 90%; /* Light border */
+    --input: 0 0% 90%; /* Light input */
+    --ring: 217 100% 55%; /* Primary Blue for focus rings */
     --warning: 60 100% 69%; /* Yellow #F1FF62 */
     --navy: 213 67% 19%; /* Navy #112358 */
     --radius: 0.75rem;
     --inputbg: #e5e5e5;
     --borderbg: #b7b7b7;
+
+    /* Sidebar variables */
+    --sidebar: hsl(0 0% 98%);
+    --sidebar-foreground: hsl(240 5.3% 26.1%);
+    --sidebar-primary: hsl(240 5.9% 10%);
+    --sidebar-primary-foreground: hsl(0 0% 98%);
+    --sidebar-accent: hsl(240 4.8% 95.9%);
+    --sidebar-accent-foreground: hsl(240 5.9% 10%);
+    --sidebar-border: hsl(220 13% 91%);
+    --sidebar-ring: hsl(217.2 91.2% 59.8%);
   }
 
   .dark {
@@ -39,28 +52,29 @@
     --accent: 202 88% 78%; /* Light Blue #A0D6F8 */
     --accent-foreground: 0 0% 0%; /* Black #000000 */
     --border: 0 0% 15%; /* Dark border */
+    --input: 0 0% 15%; /* Dark input */
+    --ring: 217 100% 55%; /* Primary Blue for focus rings */
     --warning: 60 100% 69%; /* Yellow #F1FF62 */
     --navy: 213 67% 19%; /* Navy #112358 */
+
+    /* Dark sidebar variables */
+    --sidebar: hsl(240 5.9% 10%);
+    --sidebar-foreground: hsl(240 4.8% 95.9%);
+    --sidebar-primary: hsl(224.3 76.3% 48%);
+    --sidebar-primary-foreground: hsl(0 0% 100%);
+    --sidebar-accent: hsl(240 3.7% 15.9%);
+    --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+    --sidebar-border: hsl(240 3.7% 15.9%);
+    --sidebar-ring: hsl(217.2 91.2% 59.8%);
   }
 
   * {
     font-family: "Poppins", system-ui, -apple-system, sans-serif;
-  }
-
-  html,
-  body {
-    font-family: "Poppins", system-ui, -apple-system, sans-serif;
-    margin: 0;
-    padding: 0;
-  }
-
-  #root {
-    font-family: "Poppins", sans-serif;
+    @apply border-[#e6e6e6] dark:border-[#262626];
   }
 
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))];
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 }
@@ -85,4 +99,19 @@
 .my-element:hover {
   scale: 1.05;
   text-decoration: underline;
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 }
