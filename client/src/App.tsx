@@ -1,17 +1,24 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Home from "./pages/Home";
+import HomePage from "./pages/HomePage";
 import AuthLayout from "./Layout/AuthLayout";
 import LogIn from "./pages/LogIn";
 import Resgister from "./pages/Resgister";
 import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import NewPassword from "./pages/NewPassword";
-import DashboardHome from "./pages/DashboardHome";
+
 import { useAuthStore } from "./store/useAppStores";
 import { Navigate } from "react-router-dom";
 import LoadingSpinner from "./components/commonComponents.tsx/LoadingSpinner";
 import DashLayout from "./Layout/DashLayout";
+
+// Importaciones corregidas de páginas del Dashboard
+import Home from "./pages/Dashboard/Home";
+import Buscar from "./pages/Dashboard/Buscar";
+import Favorites from "./pages/Dashboard/Favorites"; // Corregido
+import Historial from "./pages/Dashboard/Historial"; // Corregido
+import Settings from "./pages/Dashboard/Settings";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -42,7 +49,7 @@ function App() {
 
       <Router>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomePage />} />
 
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LogIn />} />
@@ -53,11 +60,44 @@ function App() {
           </Route>
 
           <Route element={<DashLayout />}>
+            {/* Rutas del Dashboard correctamente configuradas */}
             <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <DashboardHome />
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/search"
+              element={
+                <ProtectedRoute>
+                  <Buscar />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/favorites"
+              element={
+                <ProtectedRoute>
+                  <Favorites />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/history"
+              element={
+                <ProtectedRoute>
+                  <Historial />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/settings"
+              element={
+                <ProtectedRoute>
+                  <Settings />
                 </ProtectedRoute>
               }
             />

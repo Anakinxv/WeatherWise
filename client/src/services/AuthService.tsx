@@ -110,3 +110,14 @@ export const changePasswordService = async (
     throw new Error("Error al cambiar la contraseña");
   }
 };
+
+export const logoutService = async (): Promise<void> => {
+  try {
+    await axios.post(`${API_URL}/logout`);
+  } catch (error: string | any) {
+    if (error.response?.data?.message) {
+      throw new Error(error.response.data.message);
+    }
+    throw new Error("Error al cerrar sesión");
+  }
+};
