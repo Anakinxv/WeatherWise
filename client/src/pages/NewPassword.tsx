@@ -14,17 +14,17 @@ import AuthInPuts from "@/components/authComponents/AuthInputs";
 import { newPasswordSchema } from "../utils/schemas/auth-schema";
 import type { newPasswordType } from "@/types/authTypes";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/useAppStores";
+import { useAppStore } from "@/store/useAppStores";
 
 function NewPassword() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const changePassword = useAuthStore((state) => state.changePassword);
-  const error = useAuthStore((state) => state.error);
-  const resetEmail = useAuthStore((state) => state.resetEmail);
-  const resetCode = useAuthStore((state) => state.resetCode);
+  const changePassword = useAppStore((state) => state.changePassword);
+  const error = useAppStore((state) => state.error);
+  const resetEmail = useAppStore((state) => state.resetEmail);
+  const resetCode = useAppStore((state) => state.resetCode);
 
   const newPasswordText = {
     title: "Nueva contraseña",

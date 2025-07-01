@@ -38,6 +38,11 @@
     --sidebar-inactive-text: #bfbfbf;
     --sidebar-hover-bg: rgba(36, 36, 36, 0.05); /* F1FF62 with 5% opacity */
     --sidebar-border: #e0e0e0;
+
+    /* Variables para scrollbar en modo claro */
+    --scrollbar-thumb: #c1c1c1;
+    --scrollbar-track: #f1f1f1;
+    --scrollbar-hover: #a8a8a8;
   }
 
   .dark {
@@ -72,6 +77,11 @@
     --sidebar-inactive-text: #6b6b6b; /* Gris oscuro para texto inactivo */
     --sidebar-hover-bg: rgba(255, 255, 255, 0.3); /* 1777FF with 30% opacity */
     --sidebar-border: #262626;
+
+    /* Variables para scrollbar en modo oscuro */
+    --scrollbar-thumb: #444444;
+    --scrollbar-track: #1a1a1a;
+    --scrollbar-hover: #666666;
   }
 
   * {
@@ -120,4 +130,52 @@
       opacity: 1;
     }
   }
+}
+
+/* Estilos para scrollbars según el tema */
+
+/* Estilo de scrollbar para modo claro */
+:root {
+  /* ...tus variables existentes... */
+
+  /* Variables para scrollbar en modo claro */
+  --scrollbar-thumb: #c1c1c1;
+  --scrollbar-track: #f1f1f1;
+  --scrollbar-hover: #a8a8a8;
+}
+
+/* Estilo de scrollbar para modo oscuro */
+.dark {
+  /* ...tus variables existentes... */
+
+  /* Variables para scrollbar en modo oscuro */
+  --scrollbar-thumb: #444444;
+  --scrollbar-track: #1a1a1a;
+  --scrollbar-hover: #666666;
+}
+
+/* Estilos de scrollbar globales */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-hover);
+}
+
+/* Para Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }

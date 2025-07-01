@@ -4,9 +4,7 @@ import type { AuthSliceType } from "./authSlice";
 import type { ClimateSliceType } from "./climateSlice";
 import { climateSlice } from "./climateSlice";
 
-export const useAuthStore = create<AuthSliceType & ClimateSliceType>(
-  (...a) => ({
-    ...createAuthSlice(...a),
-    ...climateSlice(...a),
-  })
-);
+export const useAppStore = create<AuthSliceType & ClimateSliceType>((...a) => ({
+  ...createAuthSlice(...a),
+  ...climateSlice(...a),
+}));

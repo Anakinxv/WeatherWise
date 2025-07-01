@@ -23,11 +23,11 @@ import {
 
 import { ChevronDown, Settings, User, LogOut } from "@geist-ui/icons";
 import { NavLink } from "react-router-dom";
-import { useAuthStore } from "@/store/useAppStores";
+import { useAppStore } from "@/store/useAppStores";
 
 function NavUser() {
-  const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
+  const user = useAppStore((state) => state.user);
+  const logout = useAppStore((state) => state.logout);
   const { isMobile, state } = useSidebar();
 
   const isCollapsed = state === "collapsed";

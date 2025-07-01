@@ -15,13 +15,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginShcema } from "../utils/schemas/auth-schema";
 import { Link, useNavigate } from "react-router-dom";
 import type { loginType } from "@/types/authTypes";
-import { useAuthStore } from "@/store/useAppStores";
+import { useAppStore } from "@/store/useAppStores";
 import { useEffect } from "react";
 function LogIn() {
   const navigate = useNavigate();
-  const error = useAuthStore((state) => state.error);
-  const login = useAuthStore((state) => state.login);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const error = useAppStore((state) => state.error);
+  const login = useAppStore((state) => state.login);
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
 
   const form = useForm<loginType>({
     resolver: zodResolver(loginShcema),

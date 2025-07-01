@@ -19,9 +19,20 @@ function ThemeButton() {
   return (
     <Button
       variant="ghost"
-      className="w-10 h-10 p-2 rounded-full flex items-center justify-center hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-all duration-300 border border-gray-300/50 dark:border-gray-600/50"
+      className="w-10 h-10 p-2 rounded-full flex items-center justify-center transition-all duration-300 group"
       onClick={handleToggle}
       aria-label="Toggle theme"
+      style={{
+        backgroundColor: "var(--sidebar-nav-bg)",
+        borderColor: "var(--sidebar-secondary)",
+        border: "1px solid var(--sidebar-secondary)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.backgroundColor = "var(--sidebar-bg)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.backgroundColor = "var(--sidebar-nav-bg)";
+      }}
     >
       <div className="relative w-5 h-5">
         {/* Icono de Sol (modo claro) */}
@@ -40,7 +51,7 @@ function ThemeButton() {
           }}
           className="absolute inset-0 flex items-center justify-center"
         >
-          <Sun className="w-5 h-5 text-yellow-500" />
+          <Sun className="w-5 h-5" style={{ color: "var(--sidebar-text)" }} />
         </motion.div>
 
         {/* Icono de Luna (modo oscuro) */}
@@ -59,12 +70,14 @@ function ThemeButton() {
           }}
           className="absolute inset-0 flex items-center justify-center"
         >
-          <Moon className="w-5 h-5 text-blue-400" />
+          <Moon className="w-5 h-5" style={{ color: "var(--sidebar-text)" }} />
         </motion.div>
       </div>
 
-      {/* Indicador opcional del estado actual */}
-      <div className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full bg-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+      <div
+        className="absolute -bottom-1 -right-1 w-2 h-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        style={{ backgroundColor: "var(--sidebar-text)" }}
+      />
     </Button>
   );
 }

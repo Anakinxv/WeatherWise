@@ -10,13 +10,13 @@ import HeaderDash from "@/components/DashboardComponents/HeaderDash";
 function DashLayout() {
   return (
     <SidebarProvider>
-      <main className="flex h-screen w-full">
+      <main className="flex h-screen w-full overflow-x-hidden">
         <SidebarDash />
 
-        <SidebarInset className="flex-1">
+        <SidebarInset className="flex-1 min-w-0">
           <HeaderDash />
 
-          <div className="flex-1 overflow-auto p-4">
+          <div className="flex-1 p-4 overflow-x-hidden">
             <Outlet />
           </div>
         </SidebarInset>

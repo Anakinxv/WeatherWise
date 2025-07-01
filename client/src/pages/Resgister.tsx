@@ -15,11 +15,11 @@ import AuthInputs from "../components/authComponents/AuthInputs";
 import AuthButtons from "../components/authComponents/AuthButtons";
 import { useNavigate, Link } from "react-router-dom";
 import type { registerType } from "@/types/authTypes";
-import { useAuthStore } from "@/store/useAppStores";
+import { useAppStore } from "@/store/useAppStores";
 
 function Resgister() {
-  const error = useAuthStore((state) => state.error);
-  const signup = useAuthStore((state) => state.signup);
+  const error = useAppStore((state) => state.error);
+  const signup = useAppStore((state) => state.signup);
   const navigate = useNavigate();
 
   // Estado local para controlar el formulario
@@ -39,13 +39,13 @@ function Resgister() {
 
     try {
       // Limpiar errores anteriores
-      useAuthStore.setState({ error: null });
+      useAppStore.setState({ error: null });
 
       // Esperar a que termine el registro
       await signup(values);
 
       // Verificar si hay error después de la operación
-      const currentError = useAuthStore.getState().error;
+      const currentError = useAppStore.getState().error;
 
       if (!currentError) {
         // Solo redirigir si no hay error

@@ -16,14 +16,14 @@ import { useNavigate } from "react-router-dom";
 
 import { forgotPasswordSchema } from "../utils/schemas/auth-schema";
 import type { forgotPasswordType } from "@/types/authTypes";
-import { useAuthStore } from "@/store/useAppStores";
+import { useAppStore } from "@/store/useAppStores";
 
 function ForgotPassword() {
   const navigate = useNavigate();
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const { forgotPassword } = useAuthStore((state) => state);
-  const { error } = useAuthStore((state) => state);
+  const { forgotPassword } = useAppStore((state) => state);
+  const { error } = useAppStore((state) => state);
 
   const form = useForm<forgotPasswordType>({
     resolver: zodResolver(forgotPasswordSchema),

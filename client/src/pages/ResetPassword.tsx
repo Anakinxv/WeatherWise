@@ -13,17 +13,17 @@ import { resetPasswordSchema } from "../utils/schemas/auth-schema";
 import type { resetPasswordType } from "@/types/authTypes";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useNavigate } from "react-router-dom";
-import { useAuthStore } from "@/store/useAppStores";
+import { useAppStore } from "@/store/useAppStores";
 import { Button } from "@/components/ui/button";
 import { useResendTimer } from "@/hooks/useResendTimer";
 
 function ResetPassword() {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const { resetPassword } = useAuthStore((state) => state);
-  const { error } = useAuthStore((state) => state);
-  const email = useAuthStore((state) => state.resetEmail);
-  const forgotPassword = useAuthStore((state) => state.forgotPassword);
+  const { resetPassword } = useAppStore((state) => state);
+  const { error } = useAppStore((state) => state);
+  const email = useAppStore((state) => state.resetEmail);
+  const forgotPassword = useAppStore((state) => state.forgotPassword);
   const navigate = useNavigate();
   const form = useForm<resetPasswordType>({
     resolver: zodResolver(resetPasswordSchema),

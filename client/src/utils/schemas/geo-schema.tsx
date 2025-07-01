@@ -1,6 +1,14 @@
 import z from "zod";
 
-export const states = z.object({
+export const countrySchema = z.object({
+  id: z.number(),
   name: z.string(),
-  state_code: z.string(),
 });
+
+export const stateSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+
+export type CountryType = z.infer<typeof countrySchema>;
+export type StateType = z.infer<typeof stateSchema>;

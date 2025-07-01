@@ -24,13 +24,14 @@ import {
 } from "@/components/ui/sidebar";
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import ThemeButton from "@/components/commonComponents.tsx/ThemeButton";
 
 function HeaderDash() {
   const [section, setSection] = useState("");
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div>
+      <div className="flex items-center justify-between w-full">
         <Breadcrumb className="text-sm">
           <BreadcrumbList>
             <BreadcrumbItem>
@@ -76,6 +77,8 @@ function HeaderDash() {
             <BreadcrumbItem></BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+
+        <ThemeButton></ThemeButton>
       </div>
     </header>
   );

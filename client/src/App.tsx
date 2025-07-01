@@ -8,7 +8,6 @@ import ResetPassword from "./pages/ResetPassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import NewPassword from "./pages/NewPassword";
 
-import { useAuthStore } from "./store/useAppStores";
 import { Navigate } from "react-router-dom";
 import LoadingSpinner from "./components/commonComponents.tsx/LoadingSpinner";
 import DashLayout from "./Layout/DashLayout";
@@ -16,19 +15,19 @@ import DashLayout from "./Layout/DashLayout";
 // Importaciones corregidas de páginas del Dashboard
 import Home from "./pages/Dashboard/Home";
 import Buscar from "./pages/Dashboard/Buscar";
-import Favorites from "./pages/Dashboard/Favorites"; // Corregido
-import Historial from "./pages/Dashboard/Historial"; // Corregido
+import Favorites from "./pages/Dashboard/Favorites";
+import Historial from "./pages/Dashboard/Historial";
 import Settings from "./pages/Dashboard/Settings";
+import { useAppStore } from "./store/useAppStores"; // Corregido: singular
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const isLoading = useAuthStore((state) => state.isloading);
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const isLoading = useAppStore((state) => state.isloading); // Corregido: isLoading
 
-  // Utilizar el spinner global, así que no es necesario mostrar uno aquí
   if (isLoading) {
     return null;
   }
@@ -41,7 +40,7 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 };
 
 function App() {
-  const isLoading = useAuthStore((state) => state.isloading);
+  const isLoading = useAppStore((state) => state.isloading); // Corregido: isLoading
 
   return (
     <>
@@ -60,7 +59,6 @@ function App() {
           </Route>
 
           <Route element={<DashLayout />}>
-            {/* Rutas del Dashboard correctamente configuradas */}
             <Route
               path="/dashboard"
               element={
