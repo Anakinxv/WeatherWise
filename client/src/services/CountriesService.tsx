@@ -18,8 +18,6 @@ export const getCountries = async () => {
       name: country.country,
     }));
 
-    console.log("Countries data fetched successfully:", countries);
-
     // Validate each country against the country schema
     countries.forEach((country: any) => {
       const parsedCountry = countrySchema.safeParse(country);
@@ -37,8 +35,6 @@ export const getCountries = async () => {
 
 export const getCitiesByCountry = async (countryName: string) => {
   try {
-    console.log("Fetching cities for country:", countryName);
-
     // Usar POST como indica la documentación de la API
     const response = await axios.post(`${apiUrl}/countries/states`, {
       country: countryName, // Pasar string directamente, no objeto
@@ -64,7 +60,6 @@ export const getCitiesByCountry = async (countryName: string) => {
     }));
 
     console.log("Cities data fetched successfully:", splitedCities);
-
     // Validate each city against the state schema
     splitedCities.forEach((city: any) => {
       const parsedCity = stateSchema.safeParse(city);

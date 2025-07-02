@@ -1,90 +1,70 @@
 import type { StateCreator } from "zustand";
-import { getCountries, getCitiesByCountry } from "../services/CountriesService";
-import type { CountryType, StateType } from "../utils/schemas/geo-schema";
-
-type levels = "country" | "state";
+import type { WeatherDataType, ForecastDataType } from "../types/climateTypes";
+import { getWeather, getForecastWeather } from "../services/ClimateService";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export type ClimateSliceType = {
-  countries: CountryType[];
-  states: StateType[];
-
-  isloading: boolean; // Add this line to match authSlice
+  weatherData: WeatherDataType | null;
+  forecastData: ForecastDataType[] | null;
+  isloading: boolean;
   error: string | null;
-  openModal: boolean;
-  selectedCountry: string;
-  selectedState: string;
-  currentLevel: levels;
-  setCurrentLevel: (level: levels) => void;
-  setSelectedCountry: (country: string) => void;
-  setSelectedState: (state: string) => void;
-  setOpenModal: (open: boolean) => void;
-  getCountries: () => Promise<void>;
-  getStatesByCountry: (countryName: string) => Promise<void>;
+  fetchWeatherData: (city: string) => Promise<void>;
+  fetchForecastData: (city: string) => Promise<void>;
 };
 
-// Slice
 export const climateSlice: StateCreator<ClimateSliceType> = (set, get) => ({
-  countries: [],
-  states: [],
-  isloading: false, // Use lowercase to match authSlice
+  weatherData: null,
+  isloading: false,
   error: null,
-  openModal: false,
-  selectedCountry: "",
-  selectedState: "",
-  currentLevel: "country",
+  forecastData: null,
 
-  setCurrentLevel: (level: levels) => {
-    set({ currentLevel: level });
-  },
-
-  setSelectedCountry: (country: string) => {
+  fetchWeatherData: async (city: string) => {
     set({
-      selectedCountry: country,
-      states: [], // Limpiar estados anteriores
-      selectedState: "", // Limpiar selección anterior
+      isloading: true,
+      error: null,
     });
-  },
-
-  setSelectedState: (state: string) => {
-    set({ selectedState: state });
-  },
-
-  setOpenModal: (open: boolean) => {
-    set({ openModal: open });
-  },
-
-  getCountries: async () => {
-    // Update loading state
-    set({ isloading: true, error: null });
-
     try {
-      const countries = await getCountries();
-      set({ countries, error: null, isloading: false }); // Remove the extra comma
-    } catch (error: any) {
+      const weatherData = await getWeather(city);
       set({
-        error: error.message || "Error fetching countries",
+        weatherData: weatherData?.parsedWeatherData,
         isloading: false,
+        error: null,
+      });
+      console.log("Weather data fetched successfully:", weatherData);
+    } catch (error) {
+      console.error("Error fetching weather data:", error);
+      set({
+        isloading: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred while fetching weather data",
       });
     }
   },
 
-  getStatesByCountry: async (countryName: string) => {
-    set({ isloading: true, error: null });
+  fetchForecastData: async (city: string) => {
+    set({
+      isloading: true,
+      error: null,
+    });
 
     try {
-      const response = await getCitiesByCountry(countryName);
-      console.log("States fetched successfully:", response);
-
-      if (!response) {
-        throw new Error("Invalid response structure from states API");
-      }
-
-      set({ states: response, error: null, isloading: false });
-    } catch (error: any) {
-      console.error("Error fetching states:", error);
+      const responseForecast = await getForecastWeather(city);
       set({
-        error: error.message || "Error fetching states",
+        forecastData: responseForecast,
         isloading: false,
+        error: null,
+      });
+      console.log("Forecast data fetched successfully:", responseForecast);
+    } catch (error) {
+      console.error("Error fetching forecast data:", error);
+      set({
+        isloading: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred while fetching forecast data",
       });
     }
   },

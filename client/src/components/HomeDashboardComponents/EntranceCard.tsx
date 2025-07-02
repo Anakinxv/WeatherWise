@@ -12,32 +12,9 @@ import { useAppStore } from "@/store/useAppStores";
 function EntranceCard() {
   const now = Temporal.Now.zonedDateTimeISO();
 
-  const diaDeLaSemana = now.dayOfWeek;
-  const diasDeLaSemana = [
-    "Domingo",
-    "Lunes",
-    "Martes",
-    "Miércoles",
-    "Jueves",
-    "Viernes",
-    "Sábado",
-  ];
-
-  const mes = now.month;
-  const meses = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ];
+  // Formatear día y mes directamente con la API Temporal
+  const diaDeLaSemanaStr = now.toLocaleString("es", { weekday: "long" });
+  const mesStr = now.toLocaleString("es", { month: "long" });
 
   const monthDay = now.day;
   const timeDay =
@@ -47,9 +24,38 @@ function EntranceCard() {
   const ampm = now.hour >= 12 ? "PM" : "AM";
 
   const user = useAppStore((state) => state.user);
+  const currentWeather = useAppStore((state) => state.weatherData);
+
+  // Returns the background image URL based on weatherId
+  const getBackgroundImageUrl = () => {
+    const id = currentWeather?.weatherId;
+    if (!id)
+      return "https://res.cloudinary.com/dy2wtanhl/image/upload/v1751412812/Clear_hehu3i.jpg";
+
+    if (id >= 200 && id <= 232)
+      return "https://res.cloudinary.com/dy2wtanhl/image/upload/v1751412812/Thunderstorm_cqdgal.jpg";
+    if (id >= 300 && id <= 321)
+      return "https://res.cloudinary.com/dy2wtanhl/image/upload/v1751412812/Drizzle_atq1kk.jpg";
+    if (id >= 500 && id <= 531)
+      return "https://res.cloudinary.com/dy2wtanhl/image/upload/v1751412812/Rain_ugg6nl.jpg";
+    if (id >= 600 && id <= 622)
+      return "https://res.cloudinary.com/dy2wtanhl/image/upload/v1751412813/Snow_rhselv.jpg";
+    if (id >= 701 && id <= 781)
+      return "https://res.cloudinary.com/dy2wtanhl/image/upload/v1751412812/Atmosphere_bxqfwg.jpg";
+    if (id === 800)
+      return "https://res.cloudinary.com/dy2wtanhl/image/upload/v1751412812/Clear_hehu3i.jpg";
+    if (id >= 801 && id <= 804)
+      return "https://res.cloudinary.com/dy2wtanhl/image/upload/v1751412812/Clouds_blaah4.jpg";
+    return "https://res.cloudinary.com/dy2wtanhl/image/upload/v1751412812/Clear_hehu3i.jpg";
+  };
 
   return (
-    <Card className="w-full h-full min-h-[380px] flex flex-col bg-[url('/Users/emmanuel2503/WeatherWise/client/src/assets/prueba.png')] bg-cover bg-center bg-no-repeat relative before:absolute before:content-[''] before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-r before:from-[#004499]/80 before:to-[#004499]/50 overflow-hidden border-0 flex-1">
+    <Card
+      className="w-full h-full min-h-[380px] flex flex-col bg-cover bg-center bg-no-repeat relative before:absolute before:content-[''] before:top-0 before:left-0 before:w-full before:h-full before:bg-gradient-to-r before:from-[#004499]/80 before:to-[#004499]/50 overflow-hidden border-0 flex-1"
+      style={{
+        backgroundImage: `url('${getBackgroundImageUrl()}')`,
+      }}
+    >
       {/* Header section with title and location selector */}
       <div className="w-full relative z-10 p-6">
         <div className="flex justify-between items-center w-full">
@@ -61,7 +67,7 @@ function EntranceCard() {
       </div>
 
       {/* Main content in two columns */}
-      <CardContent className="col-span-2 grid grid-cols-2 justify-between  items-center  w-full relative z-10 text-white pl-8 pr-8 pb-6 pt-0 flex-1">
+      <CardContent className="col-span-2 grid grid-cols-2 justify-between items-center w-full relative z-10 text-white pl-8 pr-8 pb-6 pt-0 flex-1">
         {/* Time and date section */}
         <div className="flex flex-col justify-center mb-4 pr-8 gap-8 h-full">
           {/* Hora y fecha */}
@@ -70,23 +76,16 @@ function EntranceCard() {
               {timeDay + " " + ampm}
             </CardTitle>
             <CardDescription className="text-base text-white/70">
-              {diasDeLaSemana[diaDeLaSemana] +
-                ", " +
-                meses[mes - 1] +
-                " " +
-                monthDay}
+              {`${diaDeLaSemanaStr}, ${mesStr} ${monthDay}`}
             </CardDescription>
           </div>
           {/* Pronóstico */}
           <div className="flex flex-col gap-2">
-            <CardTitle className="text-lg mb-0 text-white">
+            <CardTitle className="text-2xl mb-0 text-white">
               Pronóstico del tiempo
             </CardTitle>
-            <CardDescription className="text-sm text-white/70">
-              Parcialmente nublado
-            </CardDescription>
-            <CardDescription className="text-sm text-white/70">
-              Tormentas aisladas, precipitación: 30%
+            <CardDescription className="text-lg text-white/70">
+              {currentWeather?.currentWeather}
             </CardDescription>
           </div>
         </div>
@@ -100,7 +99,7 @@ function EntranceCard() {
                   Humedad
                 </CardTitle>
                 <CardDescription className="text-base text-white/70">
-                  45%
+                  {currentWeather?.humidity}%
                 </CardDescription>
               </div>
 
@@ -109,7 +108,7 @@ function EntranceCard() {
                   Viento
                 </CardTitle>
                 <CardDescription className="text-base text-white/70">
-                  12 km/h
+                  {currentWeather?.wind} m/s
                 </CardDescription>
               </div>
 
@@ -118,7 +117,7 @@ function EntranceCard() {
                   Precipitación
                 </CardTitle>
                 <CardDescription className="text-base text-white/70">
-                  0%
+                  {currentWeather?.precipitation} mm
                 </CardDescription>
               </div>
 
@@ -127,7 +126,7 @@ function EntranceCard() {
                   Sensación térmica
                 </CardTitle>
                 <CardDescription className="text-base text-white/70">
-                  26 °C
+                  {currentWeather?.feelsLike} °C
                 </CardDescription>
               </div>
             </div>

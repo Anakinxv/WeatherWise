@@ -23,7 +23,7 @@ function ThemeButton() {
       onClick={handleToggle}
       aria-label="Toggle theme"
       style={{
-        backgroundColor: "var(--sidebar-nav-bg)",
+        backgroundColor: "var(--sidebar-bg)",
         borderColor: "var(--sidebar-secondary)",
         border: "1px solid var(--sidebar-secondary)",
       }}
@@ -31,7 +31,7 @@ function ThemeButton() {
         e.currentTarget.style.backgroundColor = "var(--sidebar-bg)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = "var(--sidebar-nav-bg)";
+        e.currentTarget.style.backgroundColor = "var(--sidebar-bg)";
       }}
     >
       <div className="relative w-5 h-5">

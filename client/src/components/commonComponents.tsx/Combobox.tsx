@@ -32,7 +32,8 @@ export function Combobox() {
   const setSelectedState = useAppStore((state) => state.setSelectedState);
   const currentLevel = useAppStore((state) => state.currentLevel);
   const setCurrentLevel = useAppStore((state) => state.setCurrentLevel);
-
+  const fetchWeather = useAppStore((state) => state.fetchWeatherData);
+  const fetchForecast = useAppStore((state) => state.fetchForecastData);
   // Cargar países al montar el componente
   useEffect(() => {
     console.log("Countries length:", countries.length);
@@ -53,6 +54,9 @@ export function Combobox() {
   }, [selectedCountry, currentLevel, getStatesByCountry, setCurrentLevel]);
 
   const getPlaceholder = () => {
+    if (error) {
+      return `Error: ${error}`;
+    }
     if (isLoading) {
       return "Cargando...";
     }
@@ -82,6 +86,8 @@ export function Combobox() {
   const handleStateSelect = (state: string) => {
     console.log("State selected:", state);
     setSelectedState(state);
+    fetchWeather(state); // Fetch weather data for the selected state
+    fetchForecast(state); // Fetch forecast data for the selected state
     setOpenModal(false);
   };
 
@@ -106,28 +112,6 @@ export function Combobox() {
     }
   };
 
-  if (error) {
-    return (
-      <div className="flex flex-col gap-4 w-full max-w-md mx-auto p-6">
-        <div className="space-y-2">
-          <Button
-            variant="outline"
-            className="w-full justify-between"
-            disabled
-            style={{
-              backgroundColor: "var(--sidebar-bg)",
-              color: "var(--sidebar-text)",
-              borderColor: "var(--sidebar-secondary)",
-            }}
-          >
-            Error: {error}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="">
       <div className="space-y-2">
@@ -140,8 +124,12 @@ export function Combobox() {
               className="w-[350px] justify-between h-10" // Ancho fijo de 350px y altura fija
               style={{
                 backgroundColor: "var(--sidebar-bg)",
-                color: "var(--sidebar-text)",
-                borderColor: "var(--sidebar-secondary)",
+                color: error
+                  ? "var(--destructive, #ff0000)"
+                  : "var(--sidebar-text)",
+                borderColor: error
+                  ? "var(--destructive, #ff0000)"
+                  : "var(--sidebar-secondary)",
               }}
               disabled={isLoading}
             >
@@ -152,22 +140,29 @@ export function Combobox() {
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="w-[350px] p-0" // Ancho fijo para el popover
+            className="w-[350px] p-0 shadow-lg rounded-md overflow-hidden animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95"
             style={{
               backgroundColor: "var(--sidebar-bg)",
-              borderColor: "var(--sidebar-secondary)",
+              border: "1px solid var(--sidebar-secondary)",
+              boxShadow:
+                "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
             }}
           >
             <Command style={{ backgroundColor: "var(--sidebar-bg)" }}>
               <div
-                className="flex items-center px-3"
-                style={{ backgroundColor: "var(--sidebar-nav-bg)" }}
+                className="flex items-center px-3 py-2"
+                style={{
+                  backgroundColor: "var(--sidebar-nav-bg)",
+                  borderBottomWidth: "0.5px",
+                  borderBottomStyle: "solid",
+                  borderBottomColor: "var(--sidebar-secondary)",
+                }}
               >
                 {currentLevel === "state" && (
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 mr-2 hover:bg-[var(--sidebar-bg)]"
+                    className="h-8 w-8 p-0 mr-2 rounded-full hover:bg-[var(--sidebar-bg)] transition-colors"
                     onClick={handleBackToCountries}
                     style={{
                       color: "var(--sidebar-text)",
@@ -182,24 +177,30 @@ export function Combobox() {
                     currentLevel === "country" ? "país" : "ciudad"
                   }`}
                   style={{
-                    backgroundColor: "var(--sidebar-nav-bg)",
+                    backgroundColor: "transparent",
                     color: "var(--sidebar-text)",
+                    boxShadow: "none",
+                    border: "none",
                   }}
                   disabled={isLoading}
+                  className="focus:outline-none outline-none border-none shadow-none"
                 />
               </div>
               <CommandList
                 style={{
                   backgroundColor: "var(--sidebar-nav-bg)",
-                  height: "150px", // Reducido de 300px a 200px
-                  overflowY: "auto", // Permitir scroll si hay muchos elementos
+                  height: "250px",
+                  overflowY: "auto",
                 }}
+                className="scrollbar-thin scrollbar-thumb-[var(--sidebar-secondary)] scrollbar-track-transparent"
               >
-                <CommandEmpty style={{ color: "var(--sidebar-secondary)" }}>
+                <CommandEmpty
+                  style={{ color: "var(--sidebar-secondary)", padding: "12px" }}
+                >
                   {getEmptyMessage()}
                 </CommandEmpty>
                 {!isLoading && (
-                  <CommandGroup>
+                  <CommandGroup className="p-1">
                     {getCurrentItems().map((item, index) => (
                       <CommandItem
                         key={item.id || index}
@@ -214,10 +215,10 @@ export function Combobox() {
                         style={{
                           color: "var(--sidebar-text)",
                         }}
-                        className="hover:bg-[var(--sidebar-bg)]"
+                        className="rounded-sm hover:bg-[var(--sidebar-bg)] transition-colors my-1 cursor-pointer"
                       >
                         <Check
-                          className={`mr-2 h-4 w-4 ${
+                          className={`mr-2 h-4 w-4 flex-shrink-0 ${
                             (currentLevel === "country"
                               ? selectedCountry
                               : selectedState) === item.name
@@ -225,17 +226,17 @@ export function Combobox() {
                               : "opacity-0"
                           }`}
                         />
-                        {item.name}
+                        <span className="truncate">{item.name}</span>
                       </CommandItem>
                     ))}
                   </CommandGroup>
                 )}
                 {isLoading && (
                   <div
-                    className="py-6 text-center"
+                    className="py-8 text-center flex items-center justify-center"
                     style={{ color: "var(--sidebar-text)" }}
                   >
-                    Cargando...
+                    <div className="animate-pulse">Cargando...</div>
                   </div>
                 )}
               </CommandList>

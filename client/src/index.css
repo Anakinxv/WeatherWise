@@ -29,7 +29,7 @@
     /* Sidebar variables - Light Mode */
     --sidebar-bg: #fafafa;
     --sidebar-nav-bg: #ffffff;
-
+    --combo-bg: #ffffff91;
     --sidebar-secondary: rgb(15, 15, 16, 0.5);
     --sidebar-text: #000000;
     --sidebar-icon: #1777ff;
@@ -67,6 +67,7 @@
 
     /* Sidebar variables - Dark Mode */
     --sidebar-bg: #0f0f10;
+    --combo-bg: #0f0f1091;
     --sidebar-nav-bg: #262626;
 
     --sidebar-secondary: rgba(255, 255, 255, 0.43);
@@ -178,4 +179,12 @@
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* Añade esto a tu archivo global.css o equivalente */
+@media (max-width: 640px) {
+  .touch-target-adjust {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
