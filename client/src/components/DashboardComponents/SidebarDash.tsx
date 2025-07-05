@@ -108,16 +108,16 @@ function SidebarDash() {
                               }
                               ${
                                 isActive
-                                  ? "bg-[var(--sidebar-icon)] text-[var(--sidebar-bg)]"
+                                  ? "bg-[#3b82f6] text-[var(--sidebar-bg)]"
                                   : "text-[var(--sidebar-secondary)] hover:bg-[var(--sidebar-hover-bg)]"
-                              }`}
+                              }
+                            `}
                           >
                             <item.icon
                               className={`cursor-pointer flex-shrink-0 transition-all duration-300
                               ${isCollapsed ? "w-4 h-4" : "w-5 h-5"}
                               ${isActive ? "stroke-2" : "stroke-1"}`}
                             />
-
                             {/* Texto que se oculta cuando está colapsado */}
                             <span
                               className={`cursor-pointer text-sm transition-all duration-300 whitespace-nowrap

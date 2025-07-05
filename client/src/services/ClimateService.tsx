@@ -2,8 +2,12 @@ import axios from "axios";
 import {
   weatherDataSchema,
   forecastDataSchema,
+  cityLocationSchema,
 } from "../utils/schemas/climate-schema";
-
+import { weatherEvolutionSchema } from "../utils/schemas/climate-schema";
+import countries from "i18n-iso-countries";
+import es from "i18n-iso-countries/langs/es.json";
+countries.registerLocale(es);
 const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY;
 
 if (!apiKey) {
@@ -17,7 +21,7 @@ export const getWeather = async (city: string = "Santo Domingo") => {
 
   try {
     const response = await axios.get(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
+      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric&lang=es`
     );
 
     if (!response.data || !response.data.main || !response.data.weather) {
@@ -37,7 +41,7 @@ export const getWeather = async (city: string = "Santo Domingo") => {
     const parsedWeatherData = weatherDataSchema.safeParse(weatherData);
 
     if (!parsedWeatherData.success) {
-      console.warn("Invalid weather data:", parsedWeatherData.error);
+      console.warn("Invalids weather data:", parsedWeatherData.error);
       throw new Error("Weather data validation failed");
     }
     return {
@@ -62,7 +66,7 @@ export const getForecastWeather = async (city: string = "Santo Domingo") => {
 
   try {
     const response = await axios.get(
-      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`
+      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang=es`
     );
 
     const forecastList = response.data.list;
@@ -148,4 +152,105 @@ export const getForecastWeather = async (city: string = "Santo Domingo") => {
     }
     throw error;
   }
+};
+
+export const getMaxTempFor24Hours = async (city: string) => {
+  try {
+    const response = await axios.get(
+      `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric&lang`
+    );
+
+    const forecastList = response.data.list;
+    console.log("Forecast data for 24 hours:", forecastList);
+
+    const maxTemps = forecastList.map((item: any) => ({
+      time: item.dt_txt,
+      temp: item.main.temp,
+      tempMax: item.main.temp_max,
+      tempMin: item.main.temp_min,
+      humidity: item.main.humidity,
+      windSpeed: item.wind.speed,
+    }));
+
+    return maxTemps;
+  } catch (error) {}
+};
+
+export const getWeatherforInput = async (query: string) => {
+  if (!apiKey) {
+    throw new Error("OpenWeather API key is not configured in .env file");
+  }
+
+  if (!query || query.trim().length === 0) {
+    return [];
+  }
+
+  try {
+    const response = await axios.get(
+      `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(
+        query
+      )}&limit=20&appid=${apiKey}`
+    );
+
+    if (!response.data || !Array.isArray(response.data)) {
+      return [];
+    }
+
+    const results = response.data.map((city: any) => ({
+      name: city.name,
+      state: city.state || "",
+      country: city.country,
+      countryFull:
+        countries.getName(city.country, "es", { select: "official" }) ||
+        city.country,
+      lat: city.lat,
+      lon: city.lon,
+    }));
+
+    const filtered = results.filter(
+      (item) =>
+        item.name.toLowerCase() === query.trim().toLowerCase() ||
+        item.name.toLowerCase().includes(query.trim().toLowerCase()) ||
+        item.state.toLowerCase() === query.trim().toLowerCase() ||
+        item.state.toLowerCase().includes(query.trim().toLowerCase())
+    );
+
+    console.log("Filtered cities:", filtered);
+
+    return filtered.length > 0 ? filtered : results;
+  } catch (error) {
+    console.error("Error fetching cities for input:", error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(
+        error.response?.data?.message ||
+          "Error fetching cities from OpenWeather"
+      );
+    }
+    throw error;
+  }
+};
+
+export const getAllWeatherStatsForInput = async (query: string) => {
+  const cities = await getWeatherforInput(query);
+  if (!cities || cities.length === 0) return [];
+
+  const stats = await Promise.all(
+    cities.map(async (city: any) => {
+      try {
+        const weather = await getWeather(city.name);
+        return {
+          ...city,
+          weather: weather?.parsedWeatherData || null,
+        };
+      } catch (error) {
+        return {
+          ...city,
+          weather: null,
+          error: error instanceof Error ? error.message : "Error desconocido",
+        };
+      }
+    })
+  );
+
+  return stats;
 };

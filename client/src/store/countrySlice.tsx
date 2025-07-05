@@ -73,7 +73,6 @@ export const countrySlice: StateCreator<CountrySliceType> = (set, get) => ({
 
     try {
       const response = await getCitiesByCountry(countryName);
-      console.log("States fetched successfully:", response);
 
       if (!response) {
         throw new Error("Invalid response structure from states API");

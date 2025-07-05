@@ -43,6 +43,13 @@
     --scrollbar-thumb: #c1c1c1;
     --scrollbar-track: #f1f1f1;
     --scrollbar-hover: #a8a8a8;
+
+    /* Chart colors - Light Mode */
+    --chart-1: 14 100% 57%; /* Naranja brillante para temperatura actual #FF4D1A */
+    --chart-2: 0 84% 60%; /* Rojo para temp máxima #E53E3E */
+    --chart-3: 200 98% 39%; /* Azul frío para temp mínima #0369A1 */
+    --chart-4: 142 76% 36%; /* Verde para humedad #16A34A */
+    --chart-5: 271 81% 56%; /* Púrpura para viento #8B5CF6 */
   }
 
   .dark {
@@ -83,6 +90,13 @@
     --scrollbar-thumb: #444444;
     --scrollbar-track: #1a1a1a;
     --scrollbar-hover: #666666;
+
+    /* Chart colors - Dark Mode */
+    --chart-1: 25 95% 53%; /* Naranja más suave para temperatura #FF6B35 */
+    --chart-2: 0 72% 51%; /* Rojo suave para temp máxima #DC2626 */
+    --chart-3: 199 89% 48%; /* Azul claro para temp mínima #0EA5E9 */
+    --chart-4: 142 69% 58%; /* Verde claro para humedad #22C55E */
+    --chart-5: 271 91% 65%; /* Púrpura claro para viento #A855F7 */
   }
 
   * {
@@ -187,4 +201,52 @@
     min-height: 44px;
     min-width: 44px;
   }
+}
+
+/* Estilos mejorados para inputs */
+.dashboard-input {
+  transition: all 0.2s ease-in-out !important;
+}
+
+.dashboard-input::placeholder {
+  opacity: 0.7 !important;
+  font-weight: 400 !important;
+  transition: opacity 0.2s ease-in-out !important;
+}
+
+.dashboard-input:focus {
+  border-color: hsl(var(--primary) / 0.6) !important;
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2) !important;
+  outline: none !important;
+}
+
+.dashboard-input:hover {
+  border-color: hsl(var(--primary) / 0.4) !important;
+}
+
+.dashboard-input:focus::placeholder {
+  opacity: 0.5 !important;
+  transform: translateY(-1px) !important;
+}
+
+.dashboard-input:hover::placeholder {
+  opacity: 0.8 !important;
+}
+
+/* Estilos para modo oscuro */
+.dark .dashboard-input::placeholder {
+  opacity: 0.6 !important;
+}
+
+.dark .dashboard-input:focus {
+  border-color: hsl(var(--primary) / 0.7) !important;
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.3) !important;
+}
+
+.dark .dashboard-input:focus::placeholder {
+  opacity: 0.4 !important;
+}
+
+.dark .dashboard-input:hover::placeholder {
+  opacity: 0.7 !important;
 }

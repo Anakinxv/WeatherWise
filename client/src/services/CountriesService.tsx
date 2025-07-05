@@ -54,12 +54,10 @@ export const getCitiesByCountry = async (countryName: string) => {
     const splitedCities = cities.map((city: { id: number; name: string }) => ({
       id: city.id,
       name: city.name
-        .split(" ")
-        .filter((word) => word !== "Province")
-        .join(" "),
+        .replace(/(Province|Prefecture|District|State|Region)$/i, "")
+        .trim(),
     }));
 
-    console.log("Cities data fetched successfully:", splitedCities);
     // Validate each city against the state schema
     splitedCities.forEach((city: any) => {
       const parsedCity = stateSchema.safeParse(city);

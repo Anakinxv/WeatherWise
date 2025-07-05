@@ -34,11 +34,12 @@ export function Combobox() {
   const setCurrentLevel = useAppStore((state) => state.setCurrentLevel);
   const fetchWeather = useAppStore((state) => state.fetchWeatherData);
   const fetchForecast = useAppStore((state) => state.fetchForecastData);
+  const getMaxTempFor24Hours = useAppStore(
+    (state) => state.getMaxTempFor24Hours
+  );
   // Cargar países al montar el componente
   useEffect(() => {
-    console.log("Countries length:", countries.length);
     if (countries.length === 0) {
-      console.log("Loading countries...");
       getCountries();
     }
   }, [countries.length, getCountries]);
@@ -46,7 +47,6 @@ export function Combobox() {
   // Cargar estados cuando se selecciona un país
   useEffect(() => {
     if (selectedCountry && currentLevel === "country") {
-      console.log("Loading states for:", selectedCountry);
       getStatesByCountry(selectedCountry).then(() => {
         setCurrentLevel("state");
       });
@@ -77,17 +77,16 @@ export function Combobox() {
   };
 
   const handleCountrySelect = (country: string) => {
-    console.log("Country selected:", country);
     setSelectedCountry(country);
     setSelectedState("");
     // No cambies el nivel aquí, solo cuando termine el fetch
   };
 
   const handleStateSelect = (state: string) => {
-    console.log("State selected:", state);
     setSelectedState(state);
     fetchWeather(state); // Fetch weather data for the selected state
     fetchForecast(state); // Fetch forecast data for the selected state
+    getMaxTempFor24Hours(state); // Fetch max temp for the next 24 hours
     setOpenModal(false);
   };
 
@@ -101,10 +100,6 @@ export function Combobox() {
   };
 
   const getCurrentItems = () => {
-    console.log("Current level:", currentLevel);
-    console.log("Countries:", countries);
-    console.log("States:", states);
-
     if (currentLevel === "country") {
       return countries || [];
     } else {
