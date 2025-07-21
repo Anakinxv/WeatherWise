@@ -1,24 +1,48 @@
-import React, { useState, useEffect } from "react";
-
+import React, { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 import InputsDash from "@/components/DashboardComponents/InputsDash";
 import SearchCards from "@/components/commonComponents.tsx/SearchCards";
 import { useAppStore } from "@/store/useAppStores";
 
 function Buscar() {
+  // Separar los selectores para evitar re-renders innecesarios
   const getWeatherforInputs = useAppStore((state) => state.getWeatherforInputs);
+  const isloading = useAppStore((state) => state.isloading);
+  const error = useAppStore((state) => state.error);
 
   // Estado para el input de búsqueda
   const [input, setInput] = useState("");
   // Input con debounce para evitar llamadas excesivas
   const debouncedInput = useDebounce(input, 500);
 
+  // Función estable para buscar
+  const searchWeather = useCallback(
+    async (searchTerm: string) => {
+      if (!searchTerm || searchTerm.trim().length < 2) {
+        return;
+      }
+
+      try {
+        await getWeatherforInputs(searchTerm);
+      } catch (error) {
+        console.error("Error searching weather:", error);
+      }
+    },
+    [getWeatherforInputs]
+  );
+
   // Efecto para buscar clima cuando cambia el input debounced
   useEffect(() => {
-    if (debouncedInput.trim() !== "") {
-      getWeatherforInputs(debouncedInput);
-    }
-  }, [debouncedInput]);
+    searchWeather(debouncedInput);
+  }, [debouncedInput, searchWeather]);
+
+  // Handler para cambios en el input
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInput(e.target.value);
+    },
+    []
+  );
 
   return (
     <div>
@@ -36,14 +60,24 @@ function Buscar() {
           type="text"
           placeholder="Buscar ciudad"
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={handleInputChange}
           className="min-w-[300px] w-full max-w-[500px] sm:min-w-[500px]"
         />
       </section>
 
       {/* Resultados de búsqueda */}
       <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-        <SearchCards />
+        {isloading ? (
+          <div className="col-span-full flex justify-center items-center p-8">
+            <div className="text-lg">Buscando ciudades...</div>
+          </div>
+        ) : error ? (
+          <div className="col-span-full flex justify-center items-center p-8">
+            <p className="text-red-500">{error}</p>
+          </div>
+        ) : (
+          <SearchCards />
+        )}
       </section>
     </div>
   );

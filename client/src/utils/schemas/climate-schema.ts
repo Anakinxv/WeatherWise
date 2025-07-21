@@ -61,4 +61,6 @@ export const cityLocationSchema = z.object({
   date: z.date().describe("Date of the forecast"),
   weatherCondition: z.string().describe("Weather condition description"),
   weatherIcon: z.string().url().describe("Weather icon URL"),
+  lat: z.number().describe("Latitude of the city"),
+  lon: z.number().describe("Longitude of the city"),
 });

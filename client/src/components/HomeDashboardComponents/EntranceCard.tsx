@@ -8,9 +8,18 @@ import {
 import { Temporal } from "@js-temporal/polyfill";
 import { Combobox } from "@/components/commonComponents.tsx/Combobox";
 import { useAppStore } from "@/store/useAppStores";
+import { useLocation, useNavigate } from "react-router-dom";
+
+import { ArrowLeft } from "@geist-ui/icons";
 
 function EntranceCard() {
   const now = Temporal.Now.zonedDateTimeISO();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { name, country, state } = location.state || {};
+
+  const isSearchPage = location.pathname.includes("/search/details");
 
   // Formatear día y mes directamente con la API Temporal
   const diaDeLaSemanaStr = now.toLocaleString("es", { weekday: "long" });
@@ -59,10 +68,26 @@ function EntranceCard() {
       {/* Header section with title and location selector */}
       <div className="w-full relative z-10 p-6">
         <div className="flex justify-between items-center w-full">
-          <CardTitle className="text-2xl font-bold text-white">
-            Bienvenido de vuelta {user?.name}
-          </CardTitle>
-          <Combobox />
+          {isSearchPage ? (
+            <div className="flex items-center gap-4">
+              <ArrowLeft
+                className="text-white stroke-3"
+                onClick={() => navigate(-1)}
+              >
+                {" "}
+                Volver
+              </ArrowLeft>
+              <CardTitle className="text-2xl font-bold text-white">
+                {name}, {country} {state ? `(${state})` : ""}
+              </CardTitle>
+            </div>
+          ) : (
+            <CardTitle className="text-2xl font-bold text-white">
+              Bienvenido de vuelta {user?.name}
+            </CardTitle>
+          )}
+
+          {isSearchPage ? null : <Combobox />}
         </div>
       </div>
 
@@ -85,7 +110,7 @@ function EntranceCard() {
               Pronóstico del tiempo
             </CardTitle>
             <CardDescription className="text-lg text-white/70">
-              {currentWeather?.currentWeather}
+              {currentWeather?.currentWeather || "Cargando..."}
             </CardDescription>
           </div>
         </div>
@@ -99,7 +124,7 @@ function EntranceCard() {
                   Humedad
                 </CardTitle>
                 <CardDescription className="text-base text-white/70">
-                  {currentWeather?.humidity}%
+                  {currentWeather?.humidity || "--"}%
                 </CardDescription>
               </div>
 
@@ -108,7 +133,7 @@ function EntranceCard() {
                   Viento
                 </CardTitle>
                 <CardDescription className="text-base text-white/70">
-                  {currentWeather?.wind} m/s
+                  {currentWeather?.wind || "--"} m/s
                 </CardDescription>
               </div>
 
@@ -117,7 +142,7 @@ function EntranceCard() {
                   Precipitación
                 </CardTitle>
                 <CardDescription className="text-base text-white/70">
-                  {currentWeather?.precipitation} mm
+                  {currentWeather?.precipitation || "--"} mm
                 </CardDescription>
               </div>
 
@@ -126,7 +151,7 @@ function EntranceCard() {
                   Sensación térmica
                 </CardTitle>
                 <CardDescription className="text-base text-white/70">
-                  {currentWeather?.feelsLike} °C
+                  {currentWeather?.feelsLike || "--"} °C
                 </CardDescription>
               </div>
             </div>

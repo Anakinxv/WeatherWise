@@ -18,6 +18,7 @@ import Buscar from "./pages/Dashboard/Buscar";
 import Favorites from "./pages/Dashboard/Favorites";
 import Historial from "./pages/Dashboard/Historial";
 import Settings from "./pages/Dashboard/Settings";
+import VerDetallesDeBusqueda from "./pages/Dashboard/VerDetallesDeBusqueda";
 import { useAppStore } from "./store/useAppStores"; // Corregido: singular
 
 interface ProtectedRouteProps {
@@ -96,6 +97,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/search/details/:lat/:lon"
+              element={
+                <ProtectedRoute>
+                  <VerDetallesDeBusqueda />
                 </ProtectedRoute>
               }
             />

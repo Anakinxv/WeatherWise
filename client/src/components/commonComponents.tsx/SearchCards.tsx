@@ -3,9 +3,19 @@ import { Star } from "@geist-ui/icons";
 import { useAppStore } from "@/store/useAppStores";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion } from "framer-motion";
-import iconLluvia from "@/assets/iconLLUVIA.png";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "@geist-ui/icons";
+
 function SearchCards() {
   const searchedCity = useAppStore((state) => state.searchedCity);
+  console.log("searchedCity in SearchCards:", searchedCity);
+
+  const getWeatherforSearch = useAppStore((state) => state.getWeatherforSearch);
+  const getForecastforSearch = useAppStore(
+    (state) => state.getForecastforSearch
+  );
+  const getWeatherEvolution = useAppStore((state) => state.getWeatherEvolution);
+  const navigate = useNavigate();
 
   console.log("searchedCity", searchedCity);
 
@@ -16,6 +26,33 @@ function SearchCards() {
       </div>
     );
   }
+
+  const handleViewDetails = async (
+    lat: number,
+    lon: number,
+    name: string,
+    country: string,
+    state: string
+  ) => {
+    try {
+      if (!lat || !lon) {
+        console.error("Latitud o longitud no disponibles");
+        return;
+      }
+      await getWeatherforSearch(lat, lon);
+      await getForecastforSearch(lat, lon);
+      await getWeatherEvolution(lat, lon);
+      navigate(`/dashboard/search/details/${lat}/${lon}`, {
+        state: {
+          name,
+          country,
+          state,
+        },
+      });
+    } catch (error) {
+      console.error("Error al navegar a los detalles:", error);
+    }
+  };
 
   return (
     <>
@@ -45,7 +82,7 @@ function SearchCards() {
                   </p>
                 </div>
                 <button className="p-1 rounded-full">
-                  <Star className="stroke-yellow-400  w-6 h-6" />
+                  <Star className="stroke-yellow-400 w-6 h-6" />
                 </button>
               </div>
             </CardHeader>
@@ -55,22 +92,42 @@ function SearchCards() {
                 <div className="flex flex-col justify-center">
                   <div className="flex items-baseline gap-1 mb-4">
                     <span className="text-4xl font-bold text-[var(--sidebar-text)]">
-                      --°C
+                      {city.tempMax ? `${Math.round(city.tempMax)}°C` : "--°C"}
                     </span>
                   </div>
                   <p className="text-[var(--sidebar-text)] opacity-80 text-base font-medium">
-                    {/* Aquí puedes poner el estado del clima si lo tienes */}
-                    --
+                    {city.weatherCondition || "Cargando..."}
                   </p>
                 </div>
                 <div className="flex items-center justify-center">
-                  <img src={iconLluvia} alt="" className="h-30 w-30" />
+                  {city.weatherIcon ? (
+                    <img
+                      src={city.weatherIcon}
+                      alt={city.weatherCondition || "Clima"}
+                      className="h-20 w-20 object-contain"
+                    />
+                  ) : (
+                    <div className="h-20 w-20 bg-gray-200 rounded-full flex items-center justify-center">
+                      <span className="text-gray-400 text-xs">Sin imagen</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
 
             <div className="bg-[var(--sidebar-border)] hover:opacity-70 transition-opacity duration-200 p-0 border-t border-[var(--sidebar-border)] rounded-b-lg">
-              <button className="w-full h-full text-[var(--sidebar-text)] py-3 px-4 rounded-b-lg hover:bg-opacity-80 transition-colors duration-200 flex items-center justify-center">
+              <button
+                className="w-full h-full text-[var(--sidebar-text)] py-3 px-4 rounded-b-lg hover:bg-opacity-80 transition-colors duration-200 flex items-center justify-center"
+                onClick={() =>
+                  handleViewDetails(
+                    city.lat,
+                    city.lon,
+                    city.name,
+                    city.country,
+                    city.state
+                  )
+                }
+              >
                 Ver detalles
               </button>
             </div>
