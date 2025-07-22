@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -28,6 +28,7 @@ import ViewProfile from "@/components/DashboardComponents/ViewProfile";
 import { Button } from "../ui/button";
 
 function NavUser() {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const user = useAppStore((state) => state.user);
   const logout = useAppStore((state) => state.logout);
   const { isMobile, state } = useSidebar();
@@ -70,7 +71,7 @@ function NavUser() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
+        <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
           {isCollapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -119,16 +120,16 @@ function NavUser() {
             <DropdownMenuSeparator className="my-2 border-t border-[var(--sidebar-border)]" />
 
             <DropdownMenuGroup className="px-1 flex flex-col gap-1">
-              <DropdownMenuItem asChild onSelect={() => {}}>
+              <DropdownMenuItem asChild onSelect={() => setDropdownOpen(false)}>
                 <ViewProfile />
               </DropdownMenuItem>
-              <DropdownMenuItem asChild onSelect={() => {}}>
+              <DropdownMenuItem asChild onSelect={() => setDropdownOpen(false)}>
                 <NavLink
                   to="/dashboard/settings"
                   className="flex w-full justify-start items-center gap-2 px-2 py-1.5 text-sm font-normal text-[var(--sidebar-secondary)] hover:bg-[var(--sidebar-hover-bg)] rounded-md"
                 >
                   <Settings className="size-4" />
-                  Configuración
+                  Preferencias
                 </NavLink>
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -137,8 +138,10 @@ function NavUser() {
 
             <DropdownMenuItem
               className="text-red-500 hover:text-red-600 hover:bg-red-50 cursor-pointer"
-              onClick={() => logout()}
-              onSelect={() => {}}
+              onClick={() => {
+                logout();
+                setDropdownOpen(false);
+              }}
             >
               <LogOut className="size-4 mr-2" />
               Cerrar sesión

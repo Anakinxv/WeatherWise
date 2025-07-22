@@ -20,8 +20,6 @@ function ViewProfile() {
         </button>
       </DialogTrigger>
 
-      <DialogOverlay className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm z-50" />
-
       <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent rounded-lg shadow-2xl z-50 w-full max-w-md border-0 p-0 [&>button]:hidden">
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
