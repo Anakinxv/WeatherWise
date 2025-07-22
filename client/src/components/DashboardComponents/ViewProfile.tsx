@@ -2,9 +2,11 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
-  DialogOverlay,
   DialogClose,
+  DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { motion } from "framer-motion";
 import { User } from "@geist-ui/icons";
@@ -21,6 +23,13 @@ function ViewProfile() {
       </DialogTrigger>
 
       <DialogContent className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent rounded-lg shadow-2xl z-50 w-full max-w-md border-0 p-0 [&>button]:hidden">
+        <VisuallyHidden>
+          <DialogTitle>Perfil de Usuario</DialogTitle>
+          <DialogDescription>
+            Información del perfil del usuario actual
+          </DialogDescription>
+        </VisuallyHidden>
+
         <motion.div
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -52,7 +61,7 @@ function ViewProfile() {
             <div className="relative">
               <Avatar className="w-24 h-24 border-4 border-[var(--sidebar-border)] shadow-lg">
                 <AvatarImage
-                  src="https://via.placeholder.com/150"
+                  src="/placeholder-avatar.png"
                   alt="User Avatar"
                   className="object-cover"
                 />

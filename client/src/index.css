@@ -79,7 +79,7 @@
 
     --sidebar-secondary: rgba(255, 255, 255, 0.43);
     --sidebar-text: #ffffff;
-    --sidebar-icon: rgb(241, 255, 98);
+    --sidebar-icon: #1777ff;
     --sidebar-active-bg: rgba(23, 119, 255, 0.5); /* 1777FF with 50% opacity */
     --sidebar-active-text: #f1ff62;
     --sidebar-inactive-text: #6b6b6b; /* Gris oscuro para texto inactivo */
