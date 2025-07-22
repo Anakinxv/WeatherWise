@@ -5,17 +5,14 @@ import SearchCards from "@/components/commonComponents.tsx/SearchCards";
 import { useAppStore } from "@/store/useAppStores";
 
 function Buscar() {
-  // Separar los selectores para evitar re-renders innecesarios
   const getWeatherforInputs = useAppStore((state) => state.getWeatherforInputs);
   const isloading = useAppStore((state) => state.isloading);
   const error = useAppStore((state) => state.error);
 
-  // Estado para el input de búsqueda
   const [input, setInput] = useState("");
-  // Input con debounce para evitar llamadas excesivas
+
   const debouncedInput = useDebounce(input, 500);
 
-  // Función estable para buscar
   const searchWeather = useCallback(
     async (searchTerm: string) => {
       if (!searchTerm || searchTerm.trim().length < 2) {
@@ -31,12 +28,10 @@ function Buscar() {
     [getWeatherforInputs]
   );
 
-  // Efecto para buscar clima cuando cambia el input debounced
   useEffect(() => {
     searchWeather(debouncedInput);
   }, [debouncedInput, searchWeather]);
 
-  // Handler para cambios en el input
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setInput(e.target.value);
