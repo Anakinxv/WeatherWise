@@ -145,7 +145,7 @@ function VistalGeneral() {
             )}
           />
 
-          <div className="flex justify-end items-center mt-4">
+          <div className="flex justify-end items-center pt-6 mt-8 ">
             <Button
               type="submit"
               className="bg-[var(--sidebar-icon)] text-white hover:opacity-80"
