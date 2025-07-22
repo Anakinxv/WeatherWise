@@ -24,6 +24,8 @@ import {
 import { ChevronDown, Settings, User, LogOut } from "@geist-ui/icons";
 import { NavLink } from "react-router-dom";
 import { useAppStore } from "@/store/useAppStores";
+import ViewProfile from "@/components/DashboardComponents/ViewProfile";
+import { Button } from "../ui/button";
 
 function NavUser() {
   const user = useAppStore((state) => state.user);
@@ -117,22 +119,16 @@ function NavUser() {
             <DropdownMenuSeparator className="my-2 border-t border-[var(--sidebar-border)]" />
 
             <DropdownMenuGroup className="px-1 flex flex-col gap-1">
-              <DropdownMenuItem asChild>
-                <NavLink
-                  to="/dashboard/profile"
-                  className="flex w-full items-center gap-2 text-sm font-normal text-[var(--sidebar-secondary)] hover:bg-[var(--sidebar-hover-bg)]"
-                >
-                  <User className="size-4" />
-                  Mi Cuenta
-                </NavLink>
+              <DropdownMenuItem asChild onSelect={() => {}}>
+                <ViewProfile />
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem asChild onSelect={() => {}}>
                 <NavLink
                   to="/dashboard/settings"
-                  className="flex w-full items-center gap-2 text-sm font-normal text-[var(--sidebar-secondary)] hover:bg-[var(--sidebar-hover-bg)]"
+                  className="flex w-full justify-start items-center gap-2 px-2 py-1.5 text-sm font-normal text-[var(--sidebar-secondary)] hover:bg-[var(--sidebar-hover-bg)] rounded-md"
                 >
                   <Settings className="size-4" />
-                  Preferencias
+                  Configuración
                 </NavLink>
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -142,6 +138,7 @@ function NavUser() {
             <DropdownMenuItem
               className="text-red-500 hover:text-red-600 hover:bg-red-50 cursor-pointer"
               onClick={() => logout()}
+              onSelect={() => {}}
             >
               <LogOut className="size-4 mr-2" />
               Cerrar sesión
