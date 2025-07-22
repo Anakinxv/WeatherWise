@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+import { useTheme } from "@/context/ThemeContext";
+
 const preferencesSchema = z.object({
   units: z.enum(["metric", "imperial"]),
   theme: z.enum(["light", "dark", "system"]),
@@ -27,6 +29,8 @@ const preferencesSchema = z.object({
 type PreferencesFormValues = z.infer<typeof preferencesSchema>;
 
 function Preferencias() {
+  const { theme, setTheme, actualTheme } = useTheme();
+
   const form = useForm<PreferencesFormValues>({
     resolver: zodResolver(preferencesSchema),
     defaultValues: {
@@ -34,6 +38,10 @@ function Preferencias() {
       theme: "system",
     },
   });
+
+  const handleTheme = (value: "light" | "dark" | "system") => {
+    setTheme(value);
+  };
 
   const onSubmit = (data: PreferencesFormValues) => {
     console.log("Preferencias guardadas:", data);
@@ -78,13 +86,13 @@ function Preferencias() {
                     <SelectContent className="bg-[var(--sidebar-nav-bg)] border-[var(--sidebar-border)] shadow-lg">
                       <SelectItem
                         value="metric"
-                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover-bg)] focus:bg-[var(--sidebar-active-bg)]"
+                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-icon)] hover:text-white focus:bg-[var(--sidebar-icon)] focus:text-white"
                       >
                         Métrico (°C, km/h)
                       </SelectItem>
                       <SelectItem
                         value="imperial"
-                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover-bg)] focus:bg-[var(--sidebar-active-bg)]"
+                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-icon)] hover:text-white focus:bg-[var(--sidebar-icon)] focus:text-white"
                       >
                         Imperial (°F, mph)
                       </SelectItem>
@@ -105,7 +113,10 @@ function Preferencias() {
                     Tema
                   </FormLabel>
                   <Select
-                    onValueChange={field.onChange}
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      handleTheme(value as "light" | "dark" | "system");
+                    }}
                     defaultValue={field.value}
                   >
                     <FormControl>
@@ -116,19 +127,19 @@ function Preferencias() {
                     <SelectContent className="bg-[var(--sidebar-nav-bg)] border-[var(--sidebar-border)] shadow-lg">
                       <SelectItem
                         value="light"
-                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover-bg)] focus:bg-[var(--sidebar-active-bg)]"
+                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-icon)] hover:text-white focus:bg-[var(--sidebar-icon)] focus:text-white"
                       >
                         Claro
                       </SelectItem>
                       <SelectItem
                         value="dark"
-                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover-bg)] focus:bg-[var(--sidebar-active-bg)]"
+                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-icon)] hover:text-white focus:bg-[var(--sidebar-icon)] focus:text-white"
                       >
                         Oscuro
                       </SelectItem>
                       <SelectItem
                         value="system"
-                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-hover-bg)] focus:bg-[var(--sidebar-active-bg)]"
+                        className="text-[var(--sidebar-text)] hover:bg-[var(--sidebar-icon)] hover:text-white focus:bg-[var(--sidebar-icon)] focus:text-white"
                       >
                         Sistema
                       </SelectItem>
