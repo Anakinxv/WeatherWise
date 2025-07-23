@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const changePersonalInfoSchema = z.object({
-  profilePicture: z.string().optional(),
+  profilePictureUrl: z.string().optional(),
   name: z.string().min(2).max(100).optional(),
   email: z.string().email().optional(),
 });

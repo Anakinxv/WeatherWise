@@ -42,6 +42,14 @@ export const registerUser = async (input: CreateUserInput, res: Response) => {
       },
     });
 
+    const userPreference = await prisma.userPreference.create({
+      data: {
+        userId: newUser.id,
+        temperatureUnit: "Metric", // Por defecto, usar Métrico
+        themeContext: "light",
+      },
+    });
+
     welcomeEmailSender(newUser.name, newUser.email);
 
     // Crear respuesta usando el type UserResponse
@@ -52,6 +60,7 @@ export const registerUser = async (input: CreateUserInput, res: Response) => {
       createdAt: newUser.createdAt,
       isverified: newUser.isverified,
       lastLogin: newUser.lastLogin, // Será null inicialmente
+      profilePictureUrl: newUser.profilePictureUrl || "",
     };
 
     return res.status(201).json({
@@ -101,6 +110,7 @@ export const loginUser = async (input: LoginUserInput, res: Response) => {
       createdAt: userExist.createdAt,
       isverified: userExist.isverified,
       lastLogin: userExist.lastLogin, // Puede ser null si nunca ha iniciado sesión
+      profilePictureUrl: userExist.profilePictureUrl || "",
     };
 
     return res.status(200).json({

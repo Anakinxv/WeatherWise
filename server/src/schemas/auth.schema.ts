@@ -34,6 +34,7 @@ export const UserResponseSchema = z.object({
   createdAt: z.date(),
   isverified: z.boolean(),
   lastLogin: z.date().nullable(), // Hacer nullable porque puede ser null
+  profilePictureUrl: z.string().optional(),
 });
 
 // Tipos inferidos
