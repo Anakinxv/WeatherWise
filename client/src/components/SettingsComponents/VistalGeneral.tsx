@@ -1,5 +1,4 @@
-import React from "react";
-import { useAppStore } from "@/store/useAppStores";
+import React, { useState } from "react";
 import InputsDash from "@/components/DashboardComponents/InputsDash";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -18,19 +17,53 @@ import type { ProfileFormValues } from "@/types/settingsTypes";
 import { profileSchema } from "@/utils/schemas/settings-schema";
 
 function VistalGeneral() {
-  const user = useAppStore((state) => state.user);
+  const [file, setFile] = useState<File | null>(null);
+  const [previewURL, setPreviewURL] = useState<string | null>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       profilePicture: "",
-      name: user?.name || "",
-      email: user?.email || "",
+      name: "",
+      email: "",
     },
   });
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+
+    // Validar que el archivo no pese más de 5MB
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      alert("El archivo debe ser menor a 5MB.");
+      return;
+    }
+
+    // Crear preview URL para mostrar la imagen
+    const preview = URL.createObjectURL(selectedFile);
+    setPreviewURL(preview);
+    setFile(selectedFile);
+
+    console.log("Archivo seleccionado:", selectedFile);
+    console.log("URL de vista previa:", preview);
+  };
+
   const onSubmit = (data: ProfileFormValues) => {
-    console.log(data);
+    console.log("=== DATOS DEL FORMULARIO ===");
+    console.log("Nombre:", data.name);
+    console.log("Email:", data.email);
+    console.log("Archivo seleccionado:", file);
+    console.log("Datos del formulario:", data);
+    console.log("========================");
+
+    alert("Datos procesados correctamente (modo prueba)");
+
+    // Limpiar el archivo temporal
+    if (previewURL) {
+      URL.revokeObjectURL(previewURL);
+    }
+    setFile(null);
+    setPreviewURL(null);
   };
 
   return (
@@ -56,49 +89,33 @@ function VistalGeneral() {
                 <div className="flex items-center gap-5">
                   <Avatar className="w-50 h-50">
                     <AvatarImage
-                      src={field.value || "/default-avatar.png"}
+                      src={previewURL || field.value || "/default-avatar.png"}
                       alt="Avatar"
                     />
                     <AvatarFallback className="bg-[var(--sidebar-icon)] text-white text-4xl">
-                      {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                      U
                     </AvatarFallback>
                   </Avatar>
-                  <FormControl>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      name={field.name}
-                      onBlur={field.onBlur}
-                      ref={field.ref}
-                      className="block w-full text-sm text-[var(--sidebar-secondary)]
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-lg file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-[var(--sidebar-icon)] file:text-white
-                        file:cursor-pointer
-                        hover:file:opacity-80
-                        cursor-pointer"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          if (file.size > 5 * 1024 * 1024) {
-                            alert("El archivo debe ser menor a 5MB.");
-                            return;
-                          }
-                          const reader = new FileReader();
-                          reader.onload = (ev) => {
-                            field.onChange(ev.target?.result as string);
-                          };
-                          reader.readAsDataURL(file);
-                        } else {
-                          field.onChange("");
-                        }
-                      }}
-                    />
-                  </FormControl>
+                  <div className="flex flex-col gap-2">
+                    <FormControl>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="block w-full text-sm text-[var(--sidebar-secondary)]
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-lg file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-[var(--sidebar-icon)] file:text-white
+                          file:cursor-pointer
+                          hover:file:opacity-80
+                          cursor-pointer"
+                        onChange={handleChange}
+                      />
+                    </FormControl>
+                  </div>
                 </div>
-                <p className="text-s text-[var(--sidebar-secondary)] mt-1">
-                  JPG, GIF o PNG. Máx 1MB.
+                <p className="text-sm text-[var(--sidebar-secondary)] mt-1">
+                  JPG, GIF o PNG. Máx 5MB.
                 </p>
                 <FormMessage />
               </FormItem>

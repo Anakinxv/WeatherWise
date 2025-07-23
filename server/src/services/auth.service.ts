@@ -16,7 +16,6 @@ import {
   passwordResetSuccessEmailSender,
 } from "../mails/emailsSender";
 import { generatePasswordCode } from "../utils/generatedPasswordCode";
-import crypto from "crypto";
 
 export const registerUser = async (input: CreateUserInput, res: Response) => {
   const { name, email, password } = input;

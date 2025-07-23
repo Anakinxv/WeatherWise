@@ -14,7 +14,6 @@ import {
   resetPasswordUser,
   verifyCodeUser,
 } from "../services/auth.service";
-import { promise } from "zod";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   const input: CreateUserInput = req.body;
