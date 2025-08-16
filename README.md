@@ -65,25 +65,25 @@ WeatherWise es una aplicación web moderna para consultar el clima, gestionar tu
 
 ### Registro e inicio de sesión
 
-![Registro e inicio de sesión](projectImages/screenshot_3x_postspark_2025-08-16_03-06-23.png)
+![Registro e inicio de sesión](projectImages/screenshot_3x_postspark_2025-08-16_03-08-08.png)
 
 ---
 
 ### Dashboard y pronóstico
 
-![Dashboard y pronóstico](projectImages/screenshot_3x_postspark_2025-08-16_03-06-40.png)
+![Dashboard y pronóstico](projectImages/screenshot_3x_postspark_2025-08-16_03-07-09.png)
 
 ---
 
 ### Configuración de perfil
 
-![Configuración de perfil](projectImages/screenshot_3x_postspark_2025-08-16_03-07-09.png)
+![Configuración de perfil](projectImages/screenshot_3x_postspark_2025-08-16_03-06-40.png)
 
 ---
 
 ### Búsqueda de ciudades
 
-![Búsqueda de ciudades](projectImages/screenshot_3x_postspark_2025-08-16_03-08-08.png)
+![Búsqueda de ciudades](projectImages/screenshot_3x_postspark_2025-08-16_03-06-23.png)
 
 ---
 
