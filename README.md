@@ -1,0 +1,92 @@
+# WeatherWise
+
+WeatherWise es una aplicación web moderna para consultar el clima, gestionar tu perfil y personalizar tu experiencia meteorológica.
+
+---
+
+## ¿Qué puedes hacer en WeatherWise?
+
+- **Registrarte e iniciar sesión** de forma segura.
+- **Consultar el pronóstico** del clima en tu ciudad favorita.
+- **Editar tu perfil** y preferencias (tema, unidades de temperatura).
+- **Buscar ciudades** y ver detalles meteorológicos.
+- **Gestionar tu seguridad** (cambiar contraseña, recuperar acceso).
+
+---
+
+## Tecnologías utilizadas
+
+### Frontend (client)
+
+- **React** y **TypeScript** — UI moderna y tipada
+- **Vite** — Bundler rápido para desarrollo
+- **TailwindCSS** — Estilos utilitarios y responsivos
+- **Zustand** — Manejo de estado global
+- **React Router DOM** — Navegación SPA
+- **Axios** — Requests HTTP y manejo de cookies
+- **React Hook Form** — Formularios y validación
+- **Zod** — Validación de datos y esquemas
+- **Framer Motion** — Animaciones
+- **Radix UI** — Componentes accesibles
+- **Recharts** — Gráficas de clima
+- **Cloudinary** — Gestión de imágenes de perfil
+- **Sonner** — Notificaciones
+- **i18n-iso-countries** — Internacionalización de países
+
+### Backend (server)
+
+- **Node.js** y **Express** — API REST y lógica de negocio
+- **Prisma ORM** — Acceso y migración de base de datos PostgreSQL
+- **JWT (jsonwebtoken)** — Autenticación segura
+- **Cookie-Parser** — Manejo de cookies HTTP Only
+- **CORS** — Seguridad y acceso cross-origin
+- **Bcrypt** — Hash de contraseñas
+- **Resend API** — Envío de correos (bienvenida, recuperación)
+- **Multer** — Subida de archivos (imágenes)
+- **Zod** — Validación de datos en el backend
+- **dotenv** — Variables de entorno seguras
+
+### Otros
+
+- **PostgreSQL** — Base de datos relacional
+- **Cloudinary** — Almacenamiento y transformación de imágenes
+- **GitHub** — Control de versiones y despliegue
+
+---
+
+## Arquitectura
+
+- **Client:** Todo el manejo de usuario, vistas y llamadas a la API.
+- **Server:** Autenticación, lógica de negocio y conexión a la base de datos.
+
+---
+
+## Pantallas principales
+
+### Registro e inicio de sesión
+
+![Registro e inicio de sesión](projectImages/screenshot_3x_postspark_2025-08-16_03-06-23.png)
+
+---
+
+### Dashboard y pronóstico
+
+![Dashboard y pronóstico](projectImages/screenshot_3x_postspark_2025-08-16_03-06-40.png)
+
+---
+
+### Configuración de perfil
+
+![Configuración de perfil](projectImages/screenshot_3x_postspark_2025-08-16_03-07-09.png)
+
+---
+
+### Búsqueda de ciudades
+
+![Búsqueda de ciudades](projectImages/screenshot_3x_postspark_2025-08-16_03-08-08.png)
+
+---
+
+> WeatherWise integra todas estas tecnologías para ofrecer una experiencia moderna, segura y personalizable en la gestión de clima y usuario.
+
+**WeatherWise** es tu espacio para el clima, seguro y personalizable.
