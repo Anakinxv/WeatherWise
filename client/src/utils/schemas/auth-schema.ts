@@ -45,14 +45,27 @@ export const newPasswordSchema = z
     path: ["confirmPassword"],
   });
 
+
+// Schema actualizado para incluir profilePictureUrl
 export const userSchema = z.object({
+  id: z.number(),
   name: z.string().min(1, "El nombre es requerido"),
   email: z.string().email("Email inválido"),
   createdAt: z.string().datetime(),
   isverified: z.boolean(),
   lastLogin: z.string().datetime().nullable(),
+  profilePictureUrl: z.string().nullable().optional(), // Nueva propiedad
 });
 
+// Schema para las preferencias del usuario
+export const userPreferencesSchema = z.object({
+  id: z.number().optional(),
+  userId: z.number().optional(),
+  temperatureUnit: z.string(),
+  themeContext: z.string(),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
+});
 export const singupResponseSchema = z.object({
   user: userSchema,
   message: z.string(),

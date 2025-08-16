@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import HomePage from "./pages/HomePage";
+
 import AuthLayout from "./Layout/AuthLayout";
 import LogIn from "./pages/LogIn";
 import Resgister from "./pages/Resgister";
@@ -49,7 +49,7 @@ function App() {
 
       <Router>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
 
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LogIn />} />

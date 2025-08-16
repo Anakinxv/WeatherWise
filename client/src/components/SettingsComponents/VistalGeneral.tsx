@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React from "react";
 import InputsDash from "@/components/DashboardComponents/InputsDash";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import {
   Form,
   FormField,
@@ -15,55 +14,51 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import type { ProfileFormValues } from "@/types/settingsTypes";
 import { profileSchema } from "@/utils/schemas/settings-schema";
+import { useAppStore } from "@/store/useAppStores";
 
 function VistalGeneral() {
-  const [file, setFile] = useState<File | null>(null);
-  const [previewURL, setPreviewURL] = useState<string | null>(null);
+  // Get user and store functions
+  const user = useAppStore((state) => state.user);
+  const updateProfile = useAppStore((state) => state.updateProfile);
+  const error = useAppStore((state) => state.error);
+
+  // Función mejorada para obtener las iniciales del usuario
+  const getUserInitials = (name?: string) => {
+    if (!name) return "U";
+    const names = name.trim().split(" ");
+    if (names.length === 1) {
+      return names[0].charAt(0).toUpperCase();
+    }
+    return (
+      names[0].charAt(0) + names[names.length - 1].charAt(0)
+    ).toUpperCase();
+  };
+
+  const userInitials = getUserInitials(user?.name);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      profilePicture: "",
-      name: "",
-      email: "",
+      profilePictureUrl: user?.profilePictureUrl || "",
+      name: user?.name || "",
+      email: user?.email || "",
     },
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (!selectedFile) return;
+  const onSubmit = async (data: ProfileFormValues) => {
+    
+    console.log(user);
+    
 
-    // Validar que el archivo no pese más de 5MB
-    if (selectedFile.size > 5 * 1024 * 1024) {
-      alert("El archivo debe ser menor a 5MB.");
+    if (!user?.id) {
+      console.error("User ID is not available");
       return;
     }
-
-    // Crear preview URL para mostrar la imagen
-    const preview = URL.createObjectURL(selectedFile);
-    setPreviewURL(preview);
-    setFile(selectedFile);
-
-    console.log("Archivo seleccionado:", selectedFile);
-    console.log("URL de vista previa:", preview);
-  };
-
-  const onSubmit = (data: ProfileFormValues) => {
-    console.log("=== DATOS DEL FORMULARIO ===");
-    console.log("Nombre:", data.name);
-    console.log("Email:", data.email);
-    console.log("Archivo seleccionado:", file);
-    console.log("Datos del formulario:", data);
-    console.log("========================");
-
-    alert("Datos procesados correctamente (modo prueba)");
-
-    // Limpiar el archivo temporal
-    if (previewURL) {
-      URL.revokeObjectURL(previewURL);
+    try {
+      await updateProfile(data);
+    } catch (error) {
+      console.error("Error updating profile:", error);
     }
-    setFile(null);
-    setPreviewURL(null);
   };
 
   return (
@@ -78,45 +73,51 @@ function VistalGeneral() {
         </p>
       </header>
 
+      {/* Show error if exists */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Avatar/Profile Picture */}
+          {/* Avatar/Profile Picture URL */}
           <FormField
             control={form.control}
-            name="profilePicture"
+            name="profilePictureUrl"
             render={({ field }) => (
               <FormItem className="space-y-2">
                 <div className="flex items-center gap-5">
                   <Avatar className="w-50 h-50">
-                    <AvatarImage
-                      src={previewURL || field.value || "/default-avatar.png"}
-                      alt="Avatar"
-                    />
-                    <AvatarFallback className="bg-[var(--sidebar-icon)] text-white text-4xl">
-                      U
-                    </AvatarFallback>
+                    {field.value || user?.profilePictureUrl ? (
+                      <AvatarImage
+                        src={
+                          field.value ||
+                          user?.profilePictureUrl ||
+                          "/default-avatar.png"
+                        }
+                        alt="Avatar"
+                      />
+                    ) : (
+                      <AvatarFallback
+                        className="text-white text-4xl"
+                        style={{ backgroundColor: "var(--sidebar-icon)" }}
+                      >
+                        {userInitials}
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                   <div className="flex flex-col gap-2">
                     <FormControl>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="block w-full text-sm text-[var(--sidebar-secondary)]
-                          file:mr-4 file:py-2 file:px-4
-                          file:rounded-lg file:border-0
-                          file:text-sm file:font-semibold
-                          file:bg-[var(--sidebar-icon)] file:text-white
-                          file:cursor-pointer
-                          hover:file:opacity-80
-                          cursor-pointer"
-                        onChange={handleChange}
+                      <InputsDash
+                        {...field}
+                        placeholder="URL de la foto de perfil"
+                        type="text"
                       />
                     </FormControl>
                   </div>
                 </div>
-                <p className="text-sm text-[var(--sidebar-secondary)] mt-1">
-                  JPG, GIF o PNG. Máx 5MB.
-                </p>
                 <FormMessage />
               </FormItem>
             )}

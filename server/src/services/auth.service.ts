@@ -8,7 +8,7 @@ import {
   VerifyCodeInput,
 } from "../schemas/auth.schema";
 import { hashPassword, comparePassword } from "../utils/hash.utils";
-import { generateToken } from "../utils/jwt.utils";
+import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import {
   passwordResetEmailSender,
@@ -16,6 +16,33 @@ import {
   passwordResetSuccessEmailSender,
 } from "../mails/emailsSender";
 import { generatePasswordCode } from "../utils/generatedPasswordCode";
+
+// Nueva función para generar tokens
+const generateToken = (
+  res: Response,
+  payload: { userId: string; email: string }
+) => {
+  const token = jwt.sign(payload, process.env.JWT_SECRET_KEY!, {
+    expiresIn: "7d",
+  });
+
+  const isProd = process.env.NODE_ENV === "production";
+
+  res.cookie("token", token, {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: isProd ? "lax" : "none", // ✅ 'none' para desarrollo cross-origin
+    secure: isProd, // ✅ secure solo en producción
+    path: "/",
+  });
+
+  console.log("🍪 Cookie configurada:", {
+    isProd,
+    sameSite: isProd ? "lax" : "none",
+  }); // Debug
+
+  return token;
+};
 
 export const registerUser = async (input: CreateUserInput, res: Response) => {
   const { name, email, password } = input;
@@ -50,6 +77,12 @@ export const registerUser = async (input: CreateUserInput, res: Response) => {
       },
     });
 
+    // Generar token JWT - convertir id a string
+    const token = generateToken(res, {
+      userId: newUser.id.toString(), // Convertir a string
+      email: newUser.email,
+    });
+
     welcomeEmailSender(newUser.name, newUser.email);
 
     // Crear respuesta usando el type UserResponse
@@ -64,7 +97,9 @@ export const registerUser = async (input: CreateUserInput, res: Response) => {
     };
 
     return res.status(201).json({
+      success: true,
       user: userResponse,
+      token, // Incluir token en respuesta
       message: "User registered successfully",
     });
   } catch (error) {
@@ -73,29 +108,36 @@ export const registerUser = async (input: CreateUserInput, res: Response) => {
   }
 };
 
-export const loginUser = async (input: LoginUserInput, res: Response) => {
+export const loginUser = async (
+  input: LoginUserInput,
+  res: Response
+): Promise<Response> => {
   const { email, password } = input;
 
   try {
+    // 1) Buscar usuario
     const userExist = await prisma.user.findUnique({
       where: { email },
     });
 
     if (!userExist) {
-      return res.status(400).json({ error: "User does not exist" });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
+    // 2) Verificar contraseña
     const isPasswordValid = await comparePassword(password, userExist.password);
     if (!isPasswordValid) {
-      return res.status(400).json({ error: "Invalid password" });
+      return res.status(401).json({ error: "Invalid email or password" });
     }
 
+    // 3) Generar JWT como cookie - convertir id a string
     const token = generateToken(res, {
-      userId: userExist.id,
+      userId: userExist.id.toString(), // Convertir a string
       email: userExist.email,
     });
 
-    await prisma.user.update({
+    // 4) Actualizar lastLogin e isverified, y usar ese resultado
+    const updatedUser = await prisma.user.update({
       where: { id: userExist.id },
       data: {
         lastLogin: new Date(),
@@ -103,18 +145,22 @@ export const loginUser = async (input: LoginUserInput, res: Response) => {
       },
     });
 
+    // 5) Preparar respuesta sin exponer password
     const userResponse: UserResponse = {
-      id: userExist.id,
-      name: userExist.name,
-      email: userExist.email,
-      createdAt: userExist.createdAt,
-      isverified: userExist.isverified,
-      lastLogin: userExist.lastLogin, // Puede ser null si nunca ha iniciado sesión
-      profilePictureUrl: userExist.profilePictureUrl || "",
+      id: updatedUser.id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      createdAt: updatedUser.createdAt,
+      isverified: updatedUser.isverified,
+      lastLogin: updatedUser.lastLogin!,
+      profilePictureUrl: updatedUser.profilePictureUrl || "",
     };
 
+    // 6) Envío final: cookie + JSON (incluimos token por si lo necesitas)
     return res.status(200).json({
+      success: true,
       user: userResponse,
+      token, // opcional, útil para clientes no-browser o debugging
       message: "User logged in successfully",
     });
   } catch (error) {
@@ -124,8 +170,16 @@ export const loginUser = async (input: LoginUserInput, res: Response) => {
 };
 
 export const logoutUser = async (res: Response) => {
-  res.clearCookie("token");
-  return res.status(200).json({ message: "User logged out successfully" });
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "lax" : "none",
+    path: "/",
+  });
+  return res.status(200).json({
+    success: true,
+    message: "User logged out successfully",
+  });
 };
 
 export const forgotPasswordUser = async (

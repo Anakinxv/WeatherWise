@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import { connectDB } from "./config/connectDB";
 import authRoutes from "./routes/auth.routes";
+import SettingRoutes from "./routes/settings.routes";
 
 // Load environment variables first
 dotenv.config();
@@ -12,13 +13,22 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
+// 🔥 CORS DEBE IR PRIMERO - ANTES QUE CUALQUIER OTRO MIDDLEWARE
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "http://localhost:3000"], // ✅ Ambos puertos
+    credentials: true, // ✅ CRUCIAL
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+  })
+);
+
+app.use(cookieParser()); // ✅ ANTES de las rutas
 app.use(express.json());
-app.use(cookieParser());
-app.use(cors()); // Added CORS middleware since it was imported but not used
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/settings", SettingRoutes);
 
 // Start server
 app.listen(PORT, async () => {

@@ -18,7 +18,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.patch(
-  "/personal",
+  "/profile",
   validate(changePersonalInfoSchema),
   changePersonalInfo
 );
